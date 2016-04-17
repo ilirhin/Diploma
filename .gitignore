@@ -1,0 +1,6 @@
+# Compiled source #
+###################
+*.aux
+*.gz
+*.log
+*.pdf
