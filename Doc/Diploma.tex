@@ -1,0 +1,465 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{MnSymbol}
+\usepackage{wasysym}
+\usepackage{mathtext}
+\usepackage{mathenv}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{amssymb,amsfonts,amsmath,mathtext,cite,enumerate,float}
+
+\usepackage[a4paper, left=25mm, right=20mm, top=20mm, bottom=20mm]{geometry}
+
+
+\newtheorem{definition}{Определение}[section]
+\newtheorem{remark}{Примечание}[subsection]
+\newtheorem{suggest}[remark]{Соглашение}
+\newtheorem{claim}[remark]{Утверждение}
+\newtheorem{lemma}[remark]{Лемма}
+\newtheorem{theorem}{Теорема}
+\newtheorem{conseq}{Следствие}[theorem]
+\newenvironment{Proof} 
+	{\par\noindent{\bf Доказательство.}} 
+	{\hfill$\blacksquare$}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true
+  tabsize=3
+}
+
+\renewcommand{\baselinestretch}{1.4}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\geq}{\geqslant}
+
+\DeclareMathOperator{\Supp}{Supp}
+
+\begin{document}
+\begin{titlepage}
+
+\begin{center}
+
+Министерство образования и науки Российской Федерации\\[1em]
+Государственное образовательное учреждение\\
+высшего профессионального образования \\
+«МОСКОВСКИЙ ФИЗИКО-ТЕХНИЧЕСКИЙ ИНСТИТУТ \\
+(ГОСУДАРСТВЕННЫЙ УНИВЕРСИТЕТ)»\\[1em]
+
+\begin{minipage}{\textwidth}
+\begin{flushleft}
+\begin{tabular}{ l l }
+Факультет & Инноваций и высоких технологий\\
+Кафедра & Анализа данных
+\end{tabular}
+\end{flushleft}
+\end{minipage}\\[1em]
+
+\begin{minipage}{\textwidth}
+\begin{flushright}
+\textit{Тип работы:}\\
+Выпускная квалификационная работа по направлению\\
+010400 «Прикладные математика и информатика»
+\end{flushright}
+\end{minipage}\\[3em]
+
+
+{Дипломная работа}\\
+{на тему:}\\[1em]
+\textbf{\large Сходимости численных методов вероятностного тематического моделирования}\\[6em]
+
+\begin{minipage}{\textwidth}
+\begin{flushright}
+\textit{Научный руководитель:}\\
+\underline{\hspace*{2.5cm}} К.\,В.~Воронцов
+\end{flushright}
+\end{minipage}\\[3em]
+
+\begin{minipage}{\textwidth}
+\begin{flushright}
+\textit{Работу выполнил:}\\
+Студент 093 группы\\
+\underline{\hspace*{2.5cm}} И.\,А.~Ирхин
+\end{flushright}
+\end{minipage}\\[3em]
+
+\vfill
+{\normalsize Москва 2016}
+\end{center}
+\end{titlepage}
+
+
+	\tableofcontents
+	\newpage
+	\renewcommand{\baselinestretch}{1.5}
+	\section{Введение}
+	Общий рассказаз про тематическое моделирование
+	\subsection{Поднятые вопросы}
+	В данной работе был поставлен вопрос \\
+	\subsection{Полученные результаты} 
+	Нами было  \\
+	\section{Аддитивная регуляризация тематических моделей}
+
+	\subsection{Классическая тематическая модель}
+	TODO\\
+	Здесь нужно сформулировать классическую задачу и расскать о её решении. Нужно упомянуть статьи \cite{plsadef1, plsadef2}
+	
+
+	\subsection{Добавление регуляризатора}
+	TODO\\
+	Здесь нужно сформулировать задачу при наличии регуляризатора и вывести общие формулы с отсылками на статьи \cite{artmdef1, artmdef2, artmdef3}\\
+	Также указать преимущества ARTM (упомянув LDA \cite{ldadef1}\\
+	В статье про ARTM на machinelearning очень хорошо написано
+
+	\subsection{Приложения ARTM}
+	TODO\\
+	Рассказать об онлайн алгоритме (\cite{ldaonline1}, есть ли статьи по онлайн ARTM), о BigARTM (статьи), если есть статьи с применением сослаться на них
+
+	\section{Сходимость метода ARTM}
+	\subsection{ARTM как GEM алгоритм}
+	Напомним,  перед нами стоит задача максимизации следующего функционала:
+\[
+L + \tau R = \sum_{w,d} n_{dw} \ln\sum_t \phi_{wt} \theta_{td} + \tau R(\phi, \theta) \to \max
+\]
+По аналогии с GEM алгоритмом введём дополнительный функционал:
+\[
+	Q(\phi, \theta, \phi', \theta') = \sum\limits_{d, w, t} n_{dw} p'_{tdw} \ln{\phi_{wt}\theta_{td}} + \tau R(\phi, \theta),
+\]
+где за $p'_{tdw}$ обозначено $\frac{\phi'_{wt} \theta'_{td}}{\sum\limits_t \phi'_{wt} \theta'_{td}}$, это обозначение будет активно использоваться в дальнейшем и для нештрихованных величин. \\
+Наша цель -- увеличивать значение данного функционала по $\phi$ и $\theta$ в сравнении с $Q(\phi', \theta', \phi', \theta')$ на каждой итерации. Запишем задачу максимизации данного функционала:
+\[
+Q(\phi, \theta, \phi', \theta') \to \max_{\phi, \theta}.
+\]
+Если мы применим теорему Куна-Такера, мы получим, что стационарная точка $Q$ должна удовлетворять следующей системе:
+\[
+\left\{
+	\begin{aligned}
+		\phi_{wt} \propto \bigg( \sum\limits_d n_{dw} p'_{tdw} + \tau\phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}} \bigg)_{+},\\
+		\theta_{td} \propto \bigg( \sum\limits_w n_{dw} p'_{tdw} + \tau\theta_{td} \frac{\partial{R}}{\partial{\theta_{td}}} \bigg)_{+}.
+	\end{aligned}
+\right.
+\]
+В итоге мы получили систему уравнений, похожых на итерации ARTM. Это означает, что каждую итерацию ARTM можно интерпретировать как попытку приблизить решение максимизационной задачи функционала $Q$, итерируя систему уравнений для стационарной точки $Q$. В зависимости от того какую точку мы будем брать начальной при итерировании системы уравнений, мы получим оба варианта итераций ARTM.\\
+Если начальное приближение это $(\phi_{wt}, \theta_{td})$, то мы получим итерации
+\[
+\left\{
+	\begin{aligned}
+		\phi_{wt} \propto \bigg( n_{wt} + \tau\phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}} \big( \phi_{wt}, \theta_{td}\big) \bigg)_{+},\\
+		\theta_{td} \propto \bigg( n_{td} + \tau\theta_{td} \frac{\partial{R}}{\partial{\theta_{td}}} \big( \phi_{wt}, \theta_{td}\big) \bigg)_{+}.
+	\end{aligned}
+\right.
+\]
+Если считать, что начальное приближение это $(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d})$, то
+\[
+\left\{
+	\begin{aligned}
+		\phi_{wt} \propto \bigg( n_{wt} + \tau \frac{n_{wt}}{n_t} \frac{\partial{R}}{\partial{\phi_{wt}}} \big(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\big) \bigg)_{+},\\
+		\theta_{td} \propto \bigg(n_{td} + \tau \frac{n_{td}}{n_d} \frac{\partial{R}}{\partial{\theta_{td}}} \big(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\big) \bigg)_{+}.
+	\end{aligned}
+\right.
+\]
+Таким образом, интерпретируя ARTM как итерации GEM алгоритма, мы можем использовать результаты о сходимостях GEM алгоритмов.
+	\subsection{Теоремы о сходимости ARTM }
+	\subsubsection{Ограниченные регуляризаторы}
+	 В работе Wu \cite{wuem} были сформулированы достаточные условия для сходимости GEM алгоритма. Чтобы их сформулировать нужно сначала ввести одно определение.
+	\begin{definition}
+	Будем говорить, что $A\colon X \to 2^X$ -- замкнутое point-to-set отображение, если из $x_k \to x$, $x \in X$, $y_k \to y$ и $y_k \in A(x_k)$ следует, что $y \in A(x)$.
+	\end{definition}
+	Итак, сформулируем теорему, немного изменив обозначения под ARTM:
+	\begin{theorem} \label{theorem_wu} \ \\
+	Пусть $\{\psi_p\}$ - GEM последовательность, сгенерированная правилосм $\psi_{p+1} \in M(\psi_p)$, где $M$ -- закмнутое point-to-set отображение. Пусть также значение $L + \tau R$ конечно и не уменьшается на итерациях, но приэтом ограниченно сверху, $|| \psi_p - \psi_{p+1}|| \to 0$, а множество стационарных точек $L + \tau R$ дискретно. Тогда $\psi_p$ сходится к некоторой стационарной точке $L + \tau R$.
+	\end{theorem}
+	Мы сведём нашу задачу к данной теореме, но сначала нам потребуется ввести новое определение.
+	\begin{definition}
+	Будем говорить, что регуляризатор $\tau R$ обладает свойством $\delta$-регулярности, если на итерациях ARTM $\forall t \exists w \colon \sum\limits_d n_{dw} p_{tdw} + \tau\phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}} > \delta$ и аналогичное условие для $\theta$. Если регуляризатор  обладает свойством $\delta$-регулярности при каком-то $\delta > 0$, то будем говорить, что данный регуляризатор сильно регулярен.
+	\end{definition}
+	Это понятие обобщает понятие регулярности (легко видеть, что обычная регулярность это 0-регулярность по этому определению). Регулярность позволяла нам утверждать, что итерации ARTM корректно определены. Сильная же регулярность позволяет утверждать, что преобразования, которые мы совершаем на итерациях, не только определены, но и непрерывны. Что можно сказать о выполнении этого свойства на практике? Мы можем гарантировать его следующим образом: если значение выражения становится меньше $\delta$, то мы зануляем всю тему и выкидываем её, таким образом происходит селекция тем (например, мы могли изначально задать слишком большое число для количества тем).
+	\begin{theorem} \label{theorem_neighbour_zero1} \ \\
+	Пусть $R$ -- ограниченная сверху и дифференцируемая функция st, причем, как регуляризатор, обладающая свойством регулярности. Также будем допустим,  что значение $Q(\phi, \theta, \phi', \theta')$ конечно и не уменьшается в сравнении $Q(\phi', \theta', \phi', \theta')$ на каждой итерации. Тогда выполнено
+\[
+KL(p_{tdw}^{(n)}||p_{tdw}^{(n + 1)}) \to 0 \text{ при } n \to \infty.
+\]
+	\end{theorem}
+	\begin{Proof}\ \\
+Заметим, что $Q$ можно переписать следующим образом:
+\[
+Q(\phi, \theta, \phi', \theta') = L(\phi, \theta) + \tau R(\phi, \theta) + \sum\limits_{d, w, t} n_{dw} p'_{tdw} \ln{p_{tdw}}
+\]
+Пусть на итерации мы перешли в точку $\phi'', \theta''$. $Q$ не уменьшается на итерациях, значит
+\[
+	Q(\phi'', \theta'', \phi', \theta') \geq Q(\phi', \theta', \phi', \theta')
+\]
+Подставим вместо $Q$ его выражение:
+\[
+	L(\phi'', \theta'') + \tau R(\phi'', \theta'') + \sum\limits_{d, w, t} n_{dw} p'_{tdw} \ln{p''_{tdw}}  \geq L(\phi', \theta') + \tau R(\phi', \theta') + \sum\limits_{d, w, t} n_{dw} p'_{tdw} \ln{p'_{tdw}}
+\]
+\[
+	\Delta(L + \tau R) \geq  \sum\limits_{d, w, t} n_{dw} p'_{tdw} \ln{\frac{p'_{tdw}}{p''_{tdw}}} = \sum\limits_{d, w} n_{dw} KL(p'_{dw} || p''_{dw}) \geq 0
+\]
+Таким образом $L + \tau R$  тоже не уменьшается. Но это ограниченная сверху функция, значит $(L + \tau R)^{(n)}$ сходится при $n \to \infty$. Более того при $n_{dw} > 0$:
+\[
+	KL(p_{tdw}^{(n)}||p_{tdw}^{(n + 1)}) \leq \Delta (L + \tau R)^{(n)} \to 0.
+\]
+\end{Proof}\ \\
+\begin{conseq} \ \\
+Если в дополнение к условиям Теоремы \ref{theorem_neighbour_zero1} $\tau R$ сильно регулярен, а $\phi_{wt}\frac{\partial{R}}{\partial{\phi_{wt}}}$ и $\theta_{td} \frac{\partial{R}}{\partial{\theta_{td}}}$ непрерывны, то:
+\[
+|\phi_{wt}^{(n)} - \phi_{wt}^{(n+1)}| \to 0 \text{ и } |\theta_{td}^{(n)} - \theta_{td}^{(n+1)}| \to 0
+\]
+\end{conseq}
+\begin{Proof}\ \\
+По неравеству Пинскера \cite{pinsker} $||P - Q||_1 \leq 2\sqrt{KL(P||Q)}$. Поэтому сходимость по $KL$ влечёт за собой сходимость по $l_1$ норме. Осталось заметить, что в потребованных условиях  $\phi_{wt}$ и $\theta_{td}$ являются непрерывными функциями от $p_{tdw}$. А значит, сходимость вторых влечёт за собой сходимость первых.
+\end{Proof}\ \\\
+\begin{conseq} \ \\
+В условия Следствия 1 все предельные точки $\phi$ и $\theta$ являются стационарными точками $L + \tau R$.
+\end{conseq}
+\begin{Proof}\ \\
+Пусть  $\phi^0, \theta^0$ -- предельная точка. Мы знаем, что выполнено:
+\[
+Q(\phi, \theta, \phi^0, \theta^0) =  L(\phi, \theta) + \tau R(\phi, \theta) + \sum\limits_{d, w, t} n_{dw} p^0_{tdw} \ln{p_{tdw}}.
+\]
+Поскольку $\phi^0, \theta^0$  -- предельная точка, то значение $Q$ уже нельзя увеличить, а значит производная по $\phi$ и по $\theta$ левой части равна нулю. При $\phi = \phi^0$ и $\theta = \theta^0$ KL достигает минимума, а значит и его производные равны нулю. Таким образом получается, что и производные $L + \tau R$ равны нулю, что и требовалось доказать. Более подробный вариант доказательства похожего утверждения описан в \cite{wuem}.
+\end{Proof}\ \\
+\begin{conseq} \ \\
+Если в дополнение к условиям Следствия 1, множество стационарных точек $L + \tau R$ дискретно, то $\phi_{wt}^{(n)}$ и $\theta_{td}^{(n)}$ сходятся к стационарной точке $L + \tau R$.
+\end{conseq}
+\begin{Proof}\ \\
+Положим $M(\phi, \theta) = \{artm(\phi, \theta)\}$, гле под $artm(\phi, \theta)$ понимается применение формул ARTM. В условиях Следствия 1 $artm$ -- непрерывное преобразование. Поэтому $M$ -- замкнутое point-to-set отображение. Остаётся заметить, что остальные условия Теоремы \ref{theorem_wu} тоже выполнены.
+\end{Proof}\ \\
+\subsubsection{Неограниченные регуляризаторы}
+В предыдущем разделе нам была важна ограниченность $R$. Однако в ARTM частно используется регуляризатор разреживания $- \alpha \ln \phi_{wt}$, который не является ограниченным. Однако на практике данный регуляризатор прекрасно работает. В данном разделе мы постараемся понять почему. Основная идея состоит в том, что на практике у нас есть машинная точность $\varepsilon$, и все значения меньшие $\varepsilon$ считаются равными нулю. Это позволяет нам ограничить область значений снизу, и тем самым ограничить регуляризатор сверху. Также есть проблема с занулениями значений на итерациях, которую в предыдущем параграфе мы обошли за счёт нереалистичных ограничений. Тем не менее, при определённых  ограничениях на регуляризатор эти зануления будут структурированными, что позволит нам провести анализ. Теперь более подробно и более формально.
+\begin{definition}
+Будем говорить, что регуляризатор $\tau R$ сохраняет 0, если на итерациях $n_{wt} = 0 \implies \phi_{wt} = 0$ и $n_{td} = 0 \implies \theta_{td} = 0$
+\end{definition}
+Легко понять, что это определение формализует следующие свойство итераций: если на какой-то итерации значение $\phi_{wt}$ стало равным нулю, то оно будет оставаться нулевым всегда, и аналогично для $\theta_{td}$.
+Стоит отметить, что на практике практически все регуляризаторы обладают подобным свойством. Более подробно мы исследуем данный вопрос в эксперементальной части нашей работы.
+\begin{definition}
+Будем говорить, что регуляризатор $\tau R$ $\varepsilon$-разреживающий, если на итерациях $\phi_{wt}, \theta_{td} \notin (0, \varepsilon)$.
+\end{definition}
+Данное свойство позволит нам формально учесть машинную точность (с этой точки зрения все регуляризаторы будут $\varepsilon$-разреживающими). Однако с точки зрения практики есть одна интересная особенность. Мы используем регуляризатор разреживания, чтобы каждой теме принадлежало лишь небольшое число слов. Фактически мы зануляем $n_{wt}$ , если его значение меньше $\alpha$, таким образом, после нормировки $\phi_{wt} \geq \frac{n_{wt} - \alpha}{n_t}$,  на реальных коллекциях очень часто происходит следующее: характерные слова темы $t$ имеют существенное значение $n_{wt}$ (например больше 1), а не характерные постепенно зануляются. В итоге мы получаем, что, начиная с некоторой итерации, $\phi_{wt} \notin (0, \frac{1-\alpha}{n_t})$ . Подробнее об этом вопросе мы поговорим в экспериментальной части.\\
+Есть альтернативный способ добиться данного ограничения, достаточно заменить исходный регуляризатор на $-\alpha \ln \min(\phi_{wt}, \alpha)$. В этом случае мы получим, что на М-шаге мы зануляем выражения меньше $\alpha$ и не изменяем остальные значения. В этом случае $\phi_{wt}\notin (0, \frac{\alpha}{n_t})$. Мы опробуем данный способ в наших экспериментах.
+\begin{definition}
+Будем говорить, что регуляризатор $\tau R$ справедливый, если на итерациях $n_{dw} > 0 \implies \exists t\colon p_{tdw} > 0$.
+\end{definition}
+Это свойство -- чистая формальность. Поскольку мы будем производить разреживания, то мы не должны случайно занулить элемент матрицы $\Phi \Theta$ для которого $n_{dw} > 0$. Это привело бы к падению $L$ до -$\infty$.  Данное свойство в точности требует, чтобы такого не происходило. На практике оно обычно будет выполнено за счёт фоновых тем\cite{artmdef2}, поскольку они как правило дают небольшие вероятности для всех тем.\\
+Итак, мы ввели три новых свойства регуляризатора, теперь мы можем доказать следующую теорему:
+
+\begin{theorem} \label{theorem_neighbour_zero2} \ \\
+	Пусть $R$ -- дифференцируемая функция при $\phi_{wt}, \theta_{td} \in (0, 1]$, причем, как регуляризатор, сохраняющая 0, справедливая, $\varepsilon$-разреживающая и обладающая свойством регулярности. Также будем допустим,  что значение $Q(\phi, \theta, \phi', \theta')$ конечно и не уменьшается в сравнении $Q(\phi', \theta', \phi', \theta')$, начиная с некоторой итерации. Тогда выполнено
+\[
+KL(p_{tdw}^{(n)}||p_{tdw}^{(n + 1)}) \to 0 \text{ при } n \to \infty.
+\]
+\end{theorem}
+\begin{Proof}\ \\
+Поскольку регуляризатор сохраняет 0, то с некоторой итерации множество позиций с нулевыми значениями в матрице $\Phi$ и $\Theta$ стабилизируется и не будет больше изменяться. Это очевидно следует из того факта, что  множество всех позиций конечно. В силу того, что регуляризатор $\varepsilon$-разреживающий значения в этих позициях будут $\geq \varepsilon$. Но $R$ -- дифференцируемая функция при $\phi_{wt}, \theta_{td} \in [\varepsilon, 1]$, а значит непрерывная и ограниченная. Далее мы можем повторить рассуждения Теоремы \ref{theorem_neighbour_zero1}, ограничивших значениями $\phi_{wt}$ и $\theta_{td}$ только в этих позициях. 
+\end{Proof}\ \\
+Также как и в случае Теоремы \ref{theorem_neighbour_zero1} данная теорема будет иметь аналогичные три следствия. Мы не будем приводить их ешё раз, так как они будут совпадать почти в каждом слове. Приведём только итоговую теорему, объединяющую все утверждения.
+\begin{theorem} \label{theorem_convergence1} \ \\
+	Пусть $R$ -- дифференцируемая функция при $\phi_{wt}, \theta_{td} \in (0, 1]$, причем, как регуляризатор, сохраняющая 0, справедливая, $\varepsilon$-разреживающая и обладающая свойством сильной регулярности, а  $\phi_{wt}\frac{\partial{R}}{\partial{\phi_{wt}}}$ и $\theta_{td} \frac{\partial{R}}{\partial{\theta_{td}}}$ непрерывны. Также будем допустим,  что значение $Q(\phi, \theta, \phi', \theta')$ конечно и не уменьшается в сравнении $Q(\phi', \theta', \phi', \theta')$, начиная с некоторой итерации. Тогда если множество стационарных точек $L + \tau R$ дискретно при любой фиксации множества ненулевых позиций, то $\phi_{wt}^{(n)}$ и $\theta_{td}^{(n)}$ сходятся к стационарной точке $L + \tau R$ при ограничении на какое-то множество нулевых позиций.
+\end{theorem}
+Давайте проанализируем регуляризатор разреживания с точки зрения данной теоремы. Свойство $\varepsilon$-разреживания мы уже обсудили ранее. Свойство справедивости обычно выполняется за счёт фоновых тем \cite{artmdef2} . Сохранение нуля данным регуляризатором и непрерывность $\phi_{wt}\frac{\partial{R}}{\partial{\phi_{wt}}}$ очевидны. Единственный важный момент -- это конечность $Q$ на итерациях. Если мы зануляем какое-то значение, то значение регуляризатора уходит в бесконечность. Чтобы избежать этого эффекта, а также иметь формальное $\varepsilon$-разреживание регуляризатором разреживания надо считать $- [\phi_{wt} \geq \varepsilon] \ln\phi_{wt}$.\\
+Таким образом, мы теперь можем ответить на вопрос, что происходит на итерациях ARTM (в предположении увеличения $Q$). По сути итерации можно разбить на два этапа: селекция ненулевых позиций и оптимизация. На первом этапе при помощи регуляризатора выбирается множество ненулевых позиций итогового решения. Понятно, что параллельно ведётся и оптимизация $L + \tau R$, но из наличия положительной срезки этот этап очень сложно анализировать. Его стоит воспринимать как подготовка начального приближения. На втором этапе оптимизация выходит на первый план. В силу того, что множество нулевых позиций не изменяется, положительную срезку в формулах можно убрать. Это облегчает анализ, более подробно об измении функционалов на итерациях мы поговорим в соответсвующей главе.
+
+	\subsection{Cвойства траектории итерационного процесса ARTM}
+Важным условием в теоремах сходимости является дискретность множества стационарных точек. В силу неединственности стохастического разложения матрицы (ссылка) это условие может не выполняться. Это подводит нас к поиску альтернативных достаточных условий сходимости. Сходимость итерационного процесса неразрывно связано со свойстами его траектории. Нам удалось связать свойства траектории процесса с изменениями $L + \tau R$.
+\begin{theorem} \label{theorem_series}\ \\
+	Пусть выполнены условия теоремы \ref{theorem_neighbour_zero1}. Тогда сходимость ряда
+	\[
+		\sum\limits_{n=1}^{\infty} (\Delta L^{(n)} + \tau \Delta R^{(n)})^{\alpha}
+	\]
+	влечёт за собой сходимость ряда
+	\[
+		\sum\limits_{n=1}^{\infty} (\Delta p_{tdw}^{(n)})^{2 \alpha}
+	\]
+\end{theorem}
+\begin{Proof}\ \\
+Нами было доказано, что $KL(p_{tdw}^{(n)}||p_{tdw}^{(n + 1)}) \leq \Delta (L + \tau R)^{(n)}$. По неравенству Пинскера $|| p_{dw}^{(n)} - p_{dw}^{(n+1)}||_1 \leq C \cdot \sqrt{KL(p_{tdw}^{(n)}||p_{tdw}^{(n+1)})} \leq C \sqrt{\Delta (L + \tau R)^{(n)}}$. А значит, $ (\Delta p_{tdw}^{(n)})^{2} \leq C^2 \Delta (L + \tau R)^{(n)} $, откуда очевидно следует требуемое утверждение.
+\end{Proof}\ \\
+\begin{conseq}
+В условиях теоремы  \ref{theorem_neighbour_zero1} ряд  $\sum\limits_{n=1}^{\infty} (\Delta p_{tdw}^{(n)})^{2 \alpha}$ сходится при $\alpha \geq 1$.
+\end{conseq}
+\begin{Proof}\ \\
+Монотонность по $\alpha$ свойства сходимости очевидна. При $\alpha=1$ мы имеем
+\[
+\sum\limits_{n=1}^{m} (\Delta L^{(n)} + \tau \Delta R^{(n)}) = ( L^{(m)} + \tau R^{(m)}) - ( L^{(0)} + \tau R^{(0)})
+\]
+А сходимость данной последовательности мы уже доказывали.
+\end{Proof}\ \\
+\begin{conseq}
+В условиях теоремы  \ref{theorem_convergence1} условие дискретности множества стационарных точек можно заменить условием сходимости ряда
+\[
+\sum\limits_{n=1}^{\infty} \sqrt{\Delta L^{(n)} + \tau \Delta R^{(n)}}.
+\]
+\end{conseq}
+К сожалению, это абсолютно неконструктивное условие. Однако, стоит взять во внимание, что при вычислениях, начиная с некоторого момента, изменения функционалов меньше машинной точности, и к этому моменту на практике частичная сумма ряда не уходит в бесконечность. Поэтому вычислительно на реальных коллекциях этот ряд сходится. Также стоит отметить, что с такой точки зрения полученная точка  сходимости будет вычислительно стационарной.
+	\subsection{Изменение регуляризационного правдоподобия на итерациях ARTM}
+	\subsubsection{Общий анализ}
+Наопмним, у нас есть два набора формул для М-шага:
+\[
+\left\{
+	\begin{aligned}
+		\phi_{wt} \propto \bigg( n_{wt} + \tau\phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}} \big( \phi_{wt}, \theta_{td}\big) \bigg)_{+},\\
+		\theta_{td} \propto \bigg( n_{td} + \tau\theta_{td} \frac{\partial{R}}{\partial{\theta_{td}}} \big( \phi_{wt}, \theta_{td}\big) \bigg)_{+}.
+	\end{aligned}
+\right.
+\]
+и
+\[
+\left\{
+	\begin{aligned}
+		\phi_{wt} \propto \bigg( n_{wt} + \tau \frac{n_{wt}}{n_t} \frac{\partial{R}}{\partial{\phi_{wt}}} \big(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\big) \bigg)_{+},\\
+		\theta_{td} \propto \bigg(n_{td} + \tau \frac{n_{td}}{n_d} \frac{\partial{R}}{\partial{\theta_{td}}} \big(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\big) \bigg)_{+}.
+	\end{aligned}
+\right.
+\]
+В таком виде трудно проводить анализ. Поэтому мы разложим это преобразование на два шага. Первый шаг -- максимизация $Q$:
+\[
+\left\{
+	\begin{aligned}
+		\phi_{wt} \propto n_{wt},\\
+		\theta_{td} \propto n_{td} .
+	\end{aligned}
+\right.
+\]
+и второй шаг (назовём его регуляризационным преобразованием) -- максимизация $R$:
+\[
+\left\{
+	\begin{aligned}
+		\phi_{wt} \propto \bigg( n_{wt} + \tau r_{wt}\bigg)_{+},\\
+		\theta_{td} \propto \bigg( n_{td} + \tau r_{td}\bigg)_{+}.
+	\end{aligned}
+\right.
+\]
+В зависимости от того, как именно мы определяем регуляризационную добавку мы получаем либо первый вариант М-шага, либо второй. Посмотрим на примере $r_{wt}. $В первом случае $r_{wt} = \tau\phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}} \big( \phi_{wt}, \theta_{td}\big)$, а во втором $\phi_{wt} = \frac{n_{wt}}{n_t} \frac{\partial{R}}{\partial{\phi_{wt}}} \big(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\big)$. Давай проанализируем 
+наши действия. Мы переходим в точку $(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d})$ на первом шаге, а затем стараемся максимизировать $R$ пройдя вдоль градиента. Первый способ предлагает определить градиент в начальной точке и потом его использовать, второй способ определяет градиент уже в новой точки. Понятно, что второй способ формально должен лучше максимизировать $R$, так как он выбирает направление оптимальное для новой точки, а не для начальной. Более того, для первого варианта нам не удалось провести анализ, так как неясно как связаны градиент в точке $(\phi_{wt}, \theta_{td})$ и $(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d})$. Для второго варианта анализ оказался весьма успешнее. В частности, для него верна следующая лемма:
+\begin{lemma}           
+ В ходе регуляризационного преобразования  без занулений, угол  между вектором изменений и градиентом $R$ острый, если градиент ненулевой.
+\end{lemma}
+\begin{Proof}
+Для простоты рассмотрим случай $R(\Phi, \Theta) = R(\Phi)$.\\
+Рассмотрим $R$ как функцию от $n_{wt}$.  Напомним, что  $\phi_{wt} = \frac{n_{wt}}{\sum\limits_w n_{wt}}$. В этом случае 
+\[
+\frac{\partial{\phi_{ut}}}{\partial{n_{wt}}} = \frac{\partial{ \frac{n_{ut}}{\sum\limits_v n_{vt}}}}{\partial{n_{wt}}} = \frac{ \frac{\partial{n_{ut}}}{\partial{n_{wt}}}}{\sum\limits_v n_{vt}} - \frac{n_{ut}}{(\sum\limits_v n_{vt})^2} = I\{u = w\} \frac{1}{n_t} - \frac{\phi_{ut}}{n_t} = \frac{1}{n_t}\bigg( 
+ I\{u = w\} - \phi_{ut} \bigg)
+\]
+\[
+\frac{\partial{R}}{\partial{n_{wt}}} = \sum_{u} \frac{\partial{R}}{\partial{\phi_{ut}}} \frac{\partial{\phi_{ut}}}{\partial{n_{wt}}} = \frac{1}{n_t} \bigg( \frac{\partial{R}}{\partial{\phi_{wt}}} - \sum_{u}  \frac{\partial{R}}{\partial{\phi_{ut}}} \phi_{wt} \bigg) = \frac{1}{n_t} \bigg( \frac{\partial{R}}{\partial{\phi_{wt}}} - \sum_{u}  \frac{\partial{R}}{\partial{\phi_{ut}}} \phi_{ut} \bigg) = \frac{1}{n_t} \sum_{u} \bigg(\frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}} \bigg)  \phi_{ut}
+\]
+С другой стороны $\Delta n_{wt} = \tau \phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}}$. Отсюда
+\[
+(\Delta n, grad\ R(n_{wt}, n_{td})) = \sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)  \tau \frac{\partial{R}}{\partial{\phi_{wt}}} \phi_{wt} \phi_{ut}  = 
+\]
+Если переобозначить $u$ за $w$ и наоборот, то 
+\[
+\sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)  \tau \frac{\partial{R}}{\partial{\phi_{wt}}} \phi_{wt} \phi_{ut}  = \sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{ut}}}  -  \frac{\partial{R}}{\partial{\phi_{wt}}}  \bigg)  \tau \frac{\partial{R}}{\partial{\phi_{ut}}} \phi_{wt} \phi_{ut} = 
+\]
+\[
+= \sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)  \tau \big(-\frac{\partial{R}}{\partial{\phi_{ut}}}\big) \phi_{wt} \phi_{ut} = 
+\]
+\[
+= \frac12 \bigg(\sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)  \tau \frac{\partial{R}}{\partial{\phi_{wt}}} \phi_{wt} \phi_{ut} +  \sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)  \tau \big(-\frac{\partial{R}}{\partial{\phi_{ut}}}\big) \phi_{wt} \phi_{ut} \bigg)= 
+\]
+\[
+= \frac12 \tau \sum\limits_{t, w, u}  \frac{1}{n_{t}} \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)^2 \phi_{wt} \phi_{ut} = \tau \sum\limits_{t, w < u}  \frac{1}{n_{t}} \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)^2 \phi_{wt} \phi_{ut} \geq 0
+\]
+Пусть достигается равенство, тогда $\frac{\partial{R}}{\partial{\phi_{wt}}}  =  \frac{\partial{R}}{\partial{\phi_{ut}}}$ для всех $u$ и $w$. Тогда
+\[
+\frac{\partial{R}}{\partial{n_{wt}}} = \frac{1}{n_t} \bigg( \frac{\partial{R}}{\partial{\phi_{wt}}} - \sum_{u}  \frac{\partial{R}}{\partial{\phi_{ut}}} \phi_{ut} \bigg) = \frac{1}{n_t} \bigg( \frac{\partial{R}}{\partial{\phi_{wt}}} - \sum_{u}  \frac{\partial{R}}{\partial{\phi_{wt}}} \phi_{ut} \bigg) =
+\]
+\[
+=\frac{1}{n_t} \bigg( \frac{\partial{R}}{\partial{\phi_{wt}}} - \frac{\partial{R}}{\partial{\phi_{wt}}} \sum_{u} \phi_{ut} \bigg)  = \frac{1}{n_t} \bigg( \frac{\partial{R}}{\partial{\phi_{wt}}} - \frac{\partial{R}}{\partial{\phi_{wt}}} \bigg) = 0
+\]
+Значит градиент нулевой -- противоречие. Значит равенство строгое и угол острый.
+\end{Proof}\ \\
+\ \\
+В прошлой главе мы доказывали, что при определённых условиях на регуляризатор сглаживаний не будет, начиная с некоторой итерации. Таким образом, если коэффициент $\tau$ не слишком большой, то на регуляризационном преобразовании будет происходить увеличение $R$ в силу малого изменения $n_{wt}$.\\
+\ \\
+Теперь нужно объединить результаты двух итераций. В ходе первого шага мы переходим в точку максимума $Q$, значит градиент $Q$ в данной точке нулевой. Это означает, что в данной точке градиент $Q + \tau R$ сонаправлен с градиентом $R$, что означает, что на шаге регуляризационного преобразования происходит неуменьшение $Q + \tau R$. Осталось понять, как изменяется данный функционал на первом шаге. Начиная с некоторого момента изменения $Q$ становятся незначительны, а это означает, что поскольку мы максимизируем $Q + \tau R$ в локальной окрестности, в которой находится и исходная точка, а значит она была потенциальным кандидатом при выборе улучшения, но если мы выбрали другое направление, то мы увеличиваем значение $Q + \tau R$ по сравнению с исходным.\\
+\ \\
+У данного рассуждения есть два допущения: первое, мы считаем, что изменения $\phi$ и $\theta$ невелики, обычно так и есть после нескольких первых итераций, когда основные частоты посчитаются и мы  перестанем делать большие скачки в пространстве матриц. Второе, мы считаем, что мы локально максимизируем $Q + \tau R$, однако мы доказали, что происходит увеличение, а не максимизация. Тем не менее, существует несколько способов обойти это условие. Во-первых, на практике угол очень острый, что позволяет производить требуемое увеличение. Во-вторых, мы можем выбирать направление между формульным и направлением на старую точку. В третьих мы можем сделать подмену регуляризатора. Пусть $R'$ т.ч. $\phi_{wt}\frac{\partial{R}}{\partial{\phi_{wt}}} = C_t \bigg( \frac{\partial{R'}}{\partial{\phi_{wt}}} - \sum_{u}  \frac{\partial{R'}}{\partial{\phi_{ut}}} \phi_{ut} \bigg)$. Тогда мы можем применить все наши рассуждения к данному регуляризатору, но для анализа использовать функционал $Q + \tau R'$. Тогда направление изменения при регуляризационном преобразовании будет совпадать с направлением градиента, а значит будет локальная максимизация.  Эта замена является перспективой дальнейшего анализа, но в данной работе она не рассматривалась. В частности интересно понять, можно ли найти аналитическое решение данного уравнения.
+           \subsubsection{Классификация регуляризаторов}
+Точки зрения изменения функционала $Q + \tau R$ стоит выделить несколько типов регуляризаторов.\\
+	 \textbf{Аналитические регуляризаторы}. В эту группу попадают регуляризаторы, для которых мы можем явно найти решение максимизационной задачи $Q + \tau R$. В этом случае нам не требуется анализировать углы между градиентами, мы получим увеличение функционала просто по построению. Таковыми регуляризаторами являются, например, регуляризаторы сглаживания и разреживания.\\ 
+	\textbf{Вогнутые регуляризаторы}. Функционал $Q$ -- вогнут, если $R$ тоже вогнутая функция, то $Q + \tau R$ тоже вогнутая функция, поэтому имеет единственный максимум. Мы доказали, что будет происходить увеличение $Q + \tau R$ при некоторых допущениях. Однако в случае случае вогнутого регулязиратора мы можем сказать, что на шаге регуляризационного преобразования мы приближаемся к глобальному максимуму, а не просто увеличваем значение. Таковыми регуляризаторами являются регуляризаторы когерентности и лапласианы графов связей документов.\\
+	\textbf{Неограниченные регуляризаторы}. В случае если регуляризатор неограничен мы получаем некорректую постановку оптимизационной задачи. Более подробно мы рассматривали эту проблему в предыдущем разделе.\\
+	\textbf{Произвольные регуляризаторы}. Для произвольных регуляризаторов мы доказали увеличение $R$ при регуляризационном преобразовании, при дополнительных условиях оно преобразуется в увеличение $Q + \tau R$ на итерациях. Здесь наиболее интересно научиться делать подмену регуляризатора по системе уравнений, которую мы описали ранее.
+           \subsection{Стремление коэффициентов к нулю}
+Важным нашим интрументом для анализа регуляризационного преобразования был подсчёт градиента, не по $\phi_{wt}$, а по $n_{wt}$. Используя данный подход, мы можем доказать следующее утверждения для коэффициентов регуляризации, стремлящихся к нулю.\\
+\begin{claim}
+Существует такая константа $\gamma$, что если $\tau_n \leq \gamma \Delta Q_n$, а также $\frac{1}{n_t} \frac{\partial{R}}{\partial{\phi_{wt}}}(n_{wt}, n_{td})$ -- ограниченная функция (константой $C$). То по формулам ARTM второго варианта на итерациях $\Delta Q_n \geq 0$.
+\end{claim}
+\begin{Proof}
+\ \\
+Для простоты рассмотрим случай $R(\Phi, \Theta) = R(\Phi)$. \\
+При регуляризационном сглаживании  $\Delta n_{wt} = \bigg( n_{wt} + \tau_n \phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}}\bigg)_{+} - n_{wt} = \alpha_{wt} \phi_{wt}$.\\
+\[
+\bigg( n_{wt} + \tau_n \phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}}\bigg)_{+} - n_{wt} \leq  n_{wt} +\bigg| \tau_n \phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}}\bigg| - n_{wt} \leq \bigg| \tau_n \phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}}\bigg|
+\]
+\[
+\bigg( n_{wt} + \tau_n \phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}}\bigg)_{+} - n_{wt} \geq  n_{wt} - \bigg| \tau_n \phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}}\bigg| - n_{wt} \geq - \bigg| \tau_n \phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}}\bigg|
+\]
+\[
+|\Delta n_{wt} | \leq \tau_n\bigg|  \phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}}\bigg| \leq \tau_n n_{wt} C \leq \tau_n n_{w} C
+\]
+Мы уже считали градиент $R$ в предыдущей главе, поэтому просто подставим:
+\[
+ \bigg|(\Delta n, grad R(n_{wt}, n_{td}) )\bigg| = \bigg| \sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)  \Delta n_{wt}  \phi_{ut} \bigg| \leq 2C^2\sum_w n_w  \tau_n \leq 2 \gamma C^2n \Delta Q_n
+\]
+Если $ 2 \gamma C^2n < 1$, то изменение $Q_n$ при регуляризационном преобразовании меньше чем при максимизации $Q_n$, а значит суммарный эффект будет положительным.
+\end{Proof}\ \\
+\ \\
+Приведём простой пример того, как можно управлять коэффициентами регуляризации. Давайте, следить за тем, чтобы $Q_n$ всегда увеличивалось, а в случае, если оно не увеличивается, будем уменьшать $\tau_n$ (например домножением на 0.95).
+
+	\section{Практические исследования}
+	Сохранение нуля регуляризаторами.\\
+          Два способа разреживания.\\
+	Нижняя оценка значения $\phi_{wt}$ при разреживании.\\
+	Изменение R на итерациях при разных сглаживаниях (на примере коррелированности). Угол между направлениями. \\
+	\subsection{Эксперимент}
+	\subsection{Результаты}
+
+	\section{Заключение и выводы}
+	Нами было 
+	\section{Благодарности}
+	Хотим выразить особую благодарность 
+\newpage
+	\begin{thebibliography}{@@@@}
+	\bibitem{plsadef1}
+		Scott Deerwester, Susan T. Dumais, George W. Furnas, Thomas K. Landauer, Richard Harshman. Indexing by Latent Semantic Analysis,  JASIS (41), 1990.
+	\bibitem{plsadef2}
+		Thomas Hofmann. Probilistic latent semantic analysis, Proceedings of the Twenty-Second Annual International SIGIR Conference on Research and Development in Information Retrieval, 1999.
+	\bibitem{ldadef1}
+		David M. Blei, Andrew Ng, Michael Jordan. Latent Dirichlet allocation, Journal of Machine Learning Research,  2003
+	\bibitem{artmdef1}
+		Vorontsov K. V. Additive Regularization for Topic Models of Text Collections, Doklady Mathematics, 2014.
+	\bibitem{artmdef2}
+		Vorontsov K. V., Potapenko A. A. Tutorial on Probabilistic Topic Modeling: Additive Regularization for Stochastic Matrix Factorization,  AIST’2014, Analysis of Images, Social networks and Texts. Springer International Publishing Switzerland, 2014.
+	\bibitem{artmdef3}
+		Vorontsov K. V., Potapenko A. A. Additive Regularization of Topic Models, Machine Learning Journal, 2014.
+	\bibitem{ldaonline1}
+		Hoffman M. D., Blei D. M., Bach F. R. Online learning for latent dirichlet allocation, NIPS, Curran Associates, Inc., 2010.
+	\bibitem{wuem}
+		C. F. Jeff Wu. On the Convergence Properties of the EM Algorithm, The Annals of Statistics, 1983
+	\bibitem{pinsker}
+		F. Topsøe. Some inequalities for information divergence and related measures of discrimination. IEEE Transactions on Information Theory, 46(9):1602–1609, 2000
+	\end{thebibliography}
+\end{document}
