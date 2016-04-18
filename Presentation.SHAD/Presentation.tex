@@ -1,0 +1,266 @@
+\documentclass[utf8]{beamer}
+\usepackage{cmap}
+\usepackage [utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage[T2A]{fontenc}
+\usepackage{cmap}
+\newsavebox{\longestsec}
+
+\usetheme{Madrid}
+\useoutertheme{tree}
+
+\newtheorem{mdefinition}{Определение}[section]
+\newtheorem{mremark}{Примечание}[subsection]
+\newtheorem{msuggest}{Предложение}[subsection]
+\newtheorem{mclaim}{Утверждение}[subsection]
+\newtheorem{mlemma}{Лемма}[subsection]
+\newtheorem{mtheorem}{Теорема}
+\newtheorem{mconseq}{Следствие}
+
+\DeclareMathOperator{\argmax}{argmax}
+\DeclareMathOperator{\argmin}{argmin}
+\DeclareMathOperator{\grad}{grad}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\norm}{norm}
+
+\title{Численные методы вероятностного тематического моделирования.}
+\date{12 апреля 2016}
+\author{Ирхин Илья Александрович}
+
+\institute{
+ Кафедра анализа данных \\
+    \vspace{0.7cm}
+    Научный руководитель:  Воронцов Константин Вячеславович \\
+    \vspace{0.7cm}
+}
+
+\begin{document}
+	\begin{frame}
+		\titlepage
+	\end{frame}
+
+	\begin{frame}
+		\frametitle{Краткое содержание}
+		\renewcommand{\baselinestretch}{1.5}
+		\fontsize{12pt}{9.2}\selectfont
+		\tableofcontents
+	\end{frame}
+	
+	\section{Постановка задачи}
+	\subsection{Формулировка задачи}
+	
+	
+	\begin{frame}
+		\frametitle{Тематическое моделирование текстовых коллекций}
+		\[
+		 	p(w|d) = \sum_t p(w|t) p(t|d)
+		\]
+		\textbf{дано:} $p(w|d) = \frac{n_{wd}}{n_d}$ -- частоты слов $w$ в документах $d$;\\
+		\textbf{найти:} $\phi_{wt} = p(w|t)$ -- распределения слов $w$ в темах $t$;\\
+		\textbf{найти:} $\theta_{td} = p(t|d)$ -- распределения тем $t$ в документах $d$;
+	\end{frame}
+
+	\subsection{Подход ARTM}
+
+		\begin{frame}
+		\frametitle{Подход ARTM}
+		Задача максимизации $\log$ правдоподобия \textcolor{red}{с регуляризатором $R$}:
+\[
+\sum_{d, w} n_{dw} \log \sum_{t} \phi_{wt} \theta_{td}  + \textcolor{red}{R(\Phi, \Theta)}\to \max_{\Phi, \Theta},
+\]
+		ЕМ-алгоритм: метод простой итерации для системы уравнений\\
+		Е-шаг
+		\[
+\begin{aligned}
+			p_{tdw} = \norm_t (\phi_{wt} \theta_{td}),
+\end{aligned}
+		\]
+		М-шаг
+		\[
+\left\{
+	\begin{aligned}
+		\phi_{wt} = \norm_w \bigg( \sum\limits_d n_{dw} p_{tdw}\textcolor{red}{ + \tau\phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}}} \bigg)_{+},\\
+		\theta_{td} = \norm_t \bigg( \sum\limits_w n_{dw} p_{tdw} \textcolor{red}{+ \tau\theta_{td} \frac{\partial{R}}{\partial{\theta_{td}}}} \bigg)_{+},\\
+	\end{aligned}
+\right.
+		\]
+	При $R = 0$, получаются формулы PLSA.\\
+	При $R = \alpha \sum\limits_{w, t}\ln \phi_{wt}$ -- LDA.
+
+\vfill\medskip\hrule\smallskip\footnotesize
+    \emph{Vorontsov\;K.\,V., Potapenko\;A.\,A.}
+    Additive Regularization of Topic Models // 
+    Machine Learning. Vol. 101, Issue 1 (2015), Pp. 303--323.
+
+	\end{frame}
+
+	\begin{frame}
+		\frametitle{Другие методы регуляризации}
+		В GЕМ-алгоритме на каждой итерации сторится функция $Q + \tau R$ , являющаяся нижней оценкой на регуляризированное правдоподобие, затем эта функция максимизируется. Обычно используется метод \textbf{Ньютона-Рафсона}:
+\[
+x^{n+1} = x^{n} - \lambda^{n} H^{-1}(x) \grad{\big(Q(x) + \tau R(x)\big)},
+\]
+где $H$ -- гессиан функции $Q + \tau R$. Из-за того, что вычисление гессиана -- трудоемкая задача, появляются сильные ограничения на регуляризатор: как правило, это квадратичная функция.
+	\end{frame}
+
+	\section{Исследование сходимости ARTM}
+	\subsection{Постановка задачи}
+	
+	\begin{frame}
+		\frametitle{Поставленные задачи}
+\begin{enumerate}
+\item Изучение свойств сходимости алгоритма ARTM.
+\item Поиск условий на регуляризаторы, способствующих сходимости.
+\item Анализ возможных улучшений алгоритма.
+\end{enumerate}
+	\end{frame}
+
+	\subsection{Полученные результаты}
+	
+	\begin{frame}
+		\frametitle{Результаты}
+Пусть выполнены следующие условия:
+\begin{enumerate}
+\item  $R$ -- дифференцируемая функция при $\phi_{wt}, \theta_{td} \in (0, 1]$.
+\item  $n_{wt} = 0 \implies \phi_{wt} = 0$ и $n_{td} = 0 \implies \theta_{td} = 0$.
+\item $\exists \varepsilon > 0 \colon \phi_{wt}, \theta_{td} \notin (0, \varepsilon)$.
+\item  $n_{dw} > 0 \implies \exists t\colon p_{tdw} > 0$.
+\item $\exists \delta \geq 0 \forall t \exists w \colon \sum\limits_d n_{dw} p_{tdw} + \tau\phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}} > \delta$ и аналогично для $\theta$.
+\item Значение $Q + \tau R$ не уменьшается, начиная с некоторой итерации.
+\end{enumerate}
+Тогда выполнено:
+\[
+KL(p_{tdw}^{(n)}||p_{tdw}^{(n + 1)}) \to 0 \text{ при } n \to \infty.
+\]
+	\end{frame}
+	
+
+	\section{Улучшения сходимости}
+	\subsection{Замена формулы М-шага}
+	
+	\begin{frame}
+		\frametitle{Несмещённые оценки в  М-шаге}
+Идея очень проста: заменить все вхождения $\phi_{wt}$ и $\theta_{td}$ на их несмещённые оценки $\frac{n_{wt}}{n_t}$ и $\frac{n_{td}}{n_d}$
+\[
+\left\{
+	\begin{aligned}
+		\phi_{wt} = \norm_w \bigg( n_{wt} + \tau \frac{n_{wt}}{n_t} \frac{\partial{R}}{\partial{\phi_{wt}}} \big(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\big) \bigg)_{+},\\
+		\theta_{td} = \norm_t \bigg(n_{td} + \tau \frac{n_{td}}{n_d} \frac{\partial{R}}{\partial{\theta_{td}}} \big(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\big) \bigg)_{+}.
+	\end{aligned}
+\right.
+\]
+В этом случае, ускоряется рост $Q + \tau R$.\\
+	\end{frame}
+
+\begin{frame}
+		\frametitle{Неформальное объяснение.}
+Итерацию ARTM можно разбить на два этапа: максимизация $Q$ за счёт $\phi_{wt} = \frac{n_{wt}}{n_t}$ и $\theta_{td} = \frac{n_{td}}{n_d}$, затем производится регуляризационное преобразование:
+\[
+\left\{
+	\begin{aligned}
+		\phi_{wt} = \norm_w \bigg( n_{wt} + \tau r_{wt}\bigg)_{+},\\
+		\theta_{td} = \norm_t \bigg( n_{td} + \tau r_{td}\bigg)_{+}.
+	\end{aligned}
+\right.
+\]
+$ r_{wt} = \phi_{wt}  \frac{\partial{R}}{\partial{\phi_{wt}}}$, а $t_{td} = \theta_{td}  \frac{\partial{R}}{\partial{\theta_{td}}}$. Вопрос лишь в том, в какой точке брать значение $r_{wt}$ и $r_{td}$. Поскольку оптимизация в начале переходит в точку $\bigg( \frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\bigg)$, то стоит считать производные именно в этой точке.
+	\end{frame}
+
+	\subsection{Уточнение градиента изменения}
+	
+	\begin{frame}
+		\frametitle{Уточнение градиента изменения}
+		Было замечено, что регуляризационная добавка не совсем оптимальна. Её можно заменить градиентом регуляризатора:
+\[
+\left\{
+	\begin{aligned}
+		\phi_{wt} = \norm_w \bigg( n_{wt} + \tau A_t \bigg[\textcolor{red} {\frac{\partial{R}}{\partial{\phi_{wt}}} - \sum\limits_u \phi_{ut} \frac{\partial{R}}{\partial{\phi_{ut}}} }\bigg] \big(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\big) \bigg)_{+},\\
+		\theta_{td} = \norm_t \bigg(n_{td} + \tau B_d \bigg[ \textcolor{red} {\frac{\partial{R}}{\partial{\theta_{td}}} - \sum\limits_s \theta_{sd} \frac{\partial{R}}{\partial{\theta_{sd}}} }\bigg] \big(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\big) \bigg)_{+}.
+	\end{aligned}
+\right.
+\]
+Подобное регуляризационное преобразование является оптимальным в плане увеличения $Q + \tau R$. Легко увидеть, что эту добавку можно эффективно вычислить.
+	\end{frame}
+\begin{frame}
+		\frametitle{Неформальное объяснение}
+В точке  $\bigg( \frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\bigg)$ можно найти градиент $R$ по $n_{wt}$ и $n_td$:
+\[
+\frac{\partial{R}}{\partial{n_{wt}}} = \frac{\partial{R}}{\partial{\phi_{wt}}} - \sum\limits_u \phi_{ut} \frac{\partial{R}}{\partial{\phi_{ut}}}
+\]
+\[
+\frac{\partial{R}}{\partial{n_{td}}} = \frac{\partial{R}}{\partial{\theta_{td}}} - \sum\limits_s \theta_{sd} \frac{\partial{R}}{\partial{\theta_{sd}}}
+\]
+Для стандартной формулы преобразования можно показать, что угол с данным градиентом всегда острый, что гарантирует увеличение $R$. Тем не менее, очевидно, что наибольшее увеличение будет давать именно изменение вдоль градиента.
+	\end{frame}
+
+\begin{frame}
+		\frametitle{Более подробно про острый угол градиента}
+
+Для упрощения будет рассмотрен случай $R(\Phi, \Theta) = R(\Phi)$.
+\[
+\frac{\partial{R}}{\partial{n_{wt}}}  = \frac{1}{n_t} \sum_{u} \bigg(\frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}} \bigg)  \phi_{ut}
+\]
+С другой стороны $\Delta n_{wt} = \tau \phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}}$. Отсюда
+\[
+(\Delta n_{wt}, grad\ R(n_{wt}, n_{td})) = \sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)  \tau \frac{\partial{R}}{\partial{\phi_{wt}}} \phi_{wt} \phi_{ut}  = 
+\]
+\[
+= \frac12 \tau \sum\limits_{t, w, u}  \frac{1}{n_{t}} \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)^2 \phi_{wt} \phi_{ut}  \geq 0
+\]
+	\end{frame}
+
+\begin{frame}
+		\frametitle{Пример регуляризатора}
+Пусть $R = -\tau \sum\limits_{w, t} \phi_{wt}$. Формально он не должен влиять на оптимизацию, поскольку просто равен константе при ограничениях задачи. Тем не менее, исходные формулы дадут следующий М-шаг:
+\[
+\left\{
+	\begin{aligned}
+		\phi_{wt} = \norm_w \bigg( n_{wt} - \tau \phi_{wt}\bigg)_{+},\\
+		\theta_{td} = \norm_t \bigg( n_{td} - \tau \theta_{td}\bigg)_{+}.
+	\end{aligned}
+\right.
+\]
+Что явно не похоже на PLSA. По новой же формуле получится, что 
+\[
+\frac{\partial{R}}{\partial{\phi_{wt}}} - \sum\limits_u \phi_{ut} \frac{\partial{R}}{\partial{\phi_{ut}}} = 1- 1 =0
+\]
+То есть в точности PLSA.
+	\end{frame}
+
+	\subsection{Экспериментальные результаты}
+	
+	\begin{frame}
+		\frametitle{Эксперименты}
+		Надо сделать
+	\end{frame}
+
+	\begin{frame}{Краткое резюме}
+ \begin{enumerate}
+\item Есть подход ARTM, он предоставлет быстрый и очень гибкий функционал для оптимизации, легко адаптируемый под конкретную задачу.
+\item Получены условия сходимости, показано, что они не являются слишком жёсткими. В экспериментах показано, что на практике они выполняются.
+\item На основании изучения градиентов оптимизируемых функционалов на итерациях ARTM предложены способы улучшения численной оптимизации.
+\end{enumerate}
+	\end{frame}
+
+\begin{frame}{Список литературы}
+\footnotesize
+\begin{thebibliography}{@@@@}
+	\bibitem{plsadef2}
+		Thomas Hofmann. Probilistic latent semantic analysis, Proceedings of the Twenty-Second Annual International SIGIR Conference on Research and Development in Information Retrieval, 1999.
+	\bibitem{ldadef1}
+		David M. Blei, Andrew Ng, Michael Jordan. Latent Dirichlet allocation, Journal of Machine Learning Research,  2003
+	\bibitem{artmdef2}
+		Vorontsov K. V., Potapenko A. A. Tutorial on Probabilistic Topic Modeling: Additive Regularization for Stochastic Matrix Factorization,  AIST’2014, Analysis of Images, Social networks and Texts. Springer International Publishing Switzerland, 2014.
+	\bibitem{artmdef3}
+		Vorontsov K. V., Potapenko A. A. Additive Regularization of Topic Models, Machine Learning Journal, 2014.
+	\bibitem{ldaonline1}
+		Hoffman M. D., Blei D. M., Bach F. R. Online learning for latent dirichlet allocation, NIPS, Curran Associates, Inc., 2010.
+	\bibitem{wuem}
+		C. F. Jeff Wu. On the Convergence Properties of the EM Algorithm, The Annals of Statistics, 1983
+	\bibitem{pinsker}
+		F. Topsøe. Some inequalities for information divergence and related measures of discrimination. IEEE Transactions on Information Theory, 46(9):1602–1609, 2000
+	\end{thebibliography}
+\end{frame}
+
+\end{document}
