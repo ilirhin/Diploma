@@ -1,0 +1,20 @@
+Hello, colleagues, my name is Ilya Irkhin, I work in Yandex and study in a magistracy of Institute.
+
+Probabilistic topic modeling is applied to identify latent topics in large collections of texts. Topic model answers the question to what topics is each document and what words appear to each topic.
+Thematic models are widely used for the last 15 years to solve various tasks of text analysis and information retrieval.
+In each specific application of the thematic model must meet about ten different requirements simultaneously.
+But the popular Bayesian models do not have the same flexibility.
+For each new application of the Bayesian model account for deduce formulas and implement in the code. 
+To simplify the modeling process, my supervisor Konstantin Vorontsov in 2014 proposed a non-Bayesian multi-criteria approach, called additive regularization of topic models.
+It is based on the simultaneous maximization model and a set of additional criteria regularizers.
+The advantage of ARTM that the algorithm can derive and implement once in the most General form for arbitrary regularizator or even for arbitrary combinations of regularizers.
+In practice, this allows you to build complex composite models with desired properties.
+Over the past two years a library has been developed BigARTM open source, very fast parallel online Regularized Expectation-Maximization algorithm, and it is really possible to add and remove regularizers, collecting model as from cubes and nothing programming. 
+However, until now it remained an open question under what conditions this algorithm converges, and whether there will be any combination of regularizers to break the iterative process. 
+In my work these conditions obtained.
+In addition, the proposed two modifications of the EM-algorithm, which slightly improves the convergence and simplify the calculation.
+A convergence theorem is proved for these modifications.
+Conditions look a bit bulky, their main point in the following.
+Regularized em-algorithm converges if regularizator effect on the model is not too much, and if not extend a premature reset of the main parameters of the model -- conditional probabilities of topics in documents and words in topics. 
+The details presented on the poster.
+Thank you for your attention.

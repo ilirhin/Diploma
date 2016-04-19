@@ -1,0 +1,21 @@
+Hello, colleagues,
+my name is Ilya Irkhin, I work in Yandex and I study in the Physics and Technology faculty magistracy.
+
+Probabilistic thematic modeling will be applied to identification of latent subjects in big collections of texts. The thematic model answers a question to what subjects each document belongs and what words each subject is represented.
+Thematic models are widely used the last 15 years for the solution of various tasks of the analysis of texts and information search.
+In each concrete appendix the thematic model has to meet to about ten various requirements at the same time.
+However popular Bayesian models don't possess such flexibility.
+For each new appendix the Bayesian model should be removed and implemented anew in a code.  
+To simplify modeling process, by my research supervisor Konstantin Vorontsov in 2014 it was offered not - the Bayesian multicriteria approach called by additive regularization of thematic models.
+It is based on simultaneous maximizing credibility of model and a set of additional criteria-regulyarizatorov.
+Advantage of ARTM is in what the algorithm is possible to remove and implement once in the most general view for any regulyarizator or even for any combination of regulyarizator.
+In practice it allows to build difficult composite models with the set properties.
+The BigARTM library with an open code, with very fast parallel on-line Regularized Expectation-Maximization algorithm was in the last two years realized, and there it is really possible to add and delete regulyarizator, collecting model as from cubes and without programming anything.  
+However still there was open a question under what conditions this algorithm meets and whether some combinations of regulyarizator will break iterative process. 
+In my work such conditions are received.
+Besides, two modifications are offered I eat - algorithm which improve convergence a little and simplify calculations.
+The theorem of convergence is proved for these modifications.
+Conditions look is a little bulky, their main sense in the following.
+Regulyarizovanny I eat - the algorithm meets if the regulyarizator influences model not too strongly and if doesn't proikhodit premature zeroing of key parameters of model - conditional probabilities of subjects in documents and in words in subjects. 
+Details are presented on a poster.
+Thanks for attention.

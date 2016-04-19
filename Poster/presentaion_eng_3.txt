@@ -1,0 +1,20 @@
+Dear colleagues, I'm Ilya Irkhin, I work in Yandex and study in graduate MIPT.
+ 
+The probabilistic topic model applied to identify the latent in large text collections. Subject model answers the question of how to apply themes each document and what words to represent each theme.
+Thematic models are widely used the past 15 years to address various problems of text analysis and information retrieval.
+In each thematic application model should meet approximately ten different requirements simultaneously.
+However, the popular Bayesian models do not have this flexibility.
+For each new application Bayesian model we have to re-derive and implement the code.
+Called additive regularization thematic models to simplify the modeling process, my supervisor Konstantin Vorontsov not-Bayes was proposed in 2014, multi-criteria approach.
+It is based on maximizing the likelihood of simultaneous models and a variety of additional criteria-regularizers.
+ARTM advantage is that the algorithm manages to derive and implement once in the most general form for an arbitrary regularizes or even for any combination regularizers.
+In practice, this allows to create complex composite pattern with the desired properties.
+Over the past two years it has been realized BigARTM library of open source software, with a very fast parallel online Regularized Expectation-Maximization algorithm, and there really is possible to add and remove regularizers collecting model as cubes or programming anything.
+However, until now it remained an open question, under what conditions, this algorithm converges, and will not be there any combination regularizers break iterative process.
+In my work these conditions are obtained.
+In addition, the proposed two modifications of the EM algorithm, which slightly improves the convergence and simplify calculations.
+convergence theorem is proved exactly for these modifications.
+Conditions are somewhat cumbersome, their basic meaning in the following.
+Regularized EM algorithm converges if regularizator affects the model is not too much, and if you do not proihodit premature zeroing key parameters of the model - conditional probabilities in the documents and in the words of the topics.
+Details are presented in the poster.
+Thank you for attention.
