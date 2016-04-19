@@ -6,7 +6,7 @@ To simplify the process of modeling, my scientific supervisor Konstantin Voronts
 
 Basing on this approach an open source library BigARTM have been developed over the past two years. It includes a very fast parallel online Regularized Expectation-Maximization algorithm and its offline version. This library provides a possibility to add and remove regularizers, collecting model as from cubes without programming. 
 
-However, there was an open question about convergence test for ARTM algorithm. These conditions were obtained in our work. In addition, we proposed two modifications of the EM-algorithm, which slightly improve the convergence and simplify the calculations. A convergence theorem is proved for these modifications.
+However, there was an open question about convergence test for ARTM algorithm. These conditions were obtained in our work. In addition, we proposed two modifications of the EM-algorithm, which slightly improve the convergence and simplify the calculations. The convergence theorem is proved for these modifications.
 
 The conditions look a bit bulky, but their main point is that regularized EM-algorithm converges if regularizer's effect on the model is not too big, and if there is a certain consistency in setting to zero of the main model parameters -- conditional probabilities of topics in documents and words in topics. 
 
