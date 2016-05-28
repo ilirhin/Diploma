@@ -18,6 +18,8 @@
 \usepackage[ruled,vlined]{algorithm2e}
 \usepackage[a4paper, left=25mm, right=20mm, top=20mm, bottom=20mm]{geometry}
 
+\bibliographystyle{plain}
+
 
 \newtheorem{definition}{Определение}[section]
 \newtheorem{remark}{Примечание}[subsection]
@@ -127,17 +129,33 @@
 	\newpage
 	\renewcommand{\baselinestretch}{1.5}
 	\section{Введение}
-Тематическое моделирование (topic modeling) — одно из современных приложений машинного обучения к анализу текстов, активно развивающееся с конца 90-х годов. Тематическая модель (topic model) коллекции текстовых документов определяет, к каким темам относится каждый документ и какие слова (термины) образуют каждую тему.\\
-Вероятностная тематическая модель (ВТМ) описывает каждую тему дискретным распределением на множестве терминов, каждый документ — дискретным распределением на множестве тем. Предполагается, что коллекция документов -- это последовательность терминов, выбранных случайно и независимо из смеси таких распределений, и ставится задача восстановления компонент смеси по выборке.
+Тематическое моделирование -- одно из современных приложений машинного обучения к анализу текстов, активно развивающееся с конца 90-х годов. Тематическая модель коллекции текстовых документов определяет, к каким темам относится каждый документ и какие слова (термины) образуют каждую тему.\\
+Вероятностная тематическая модель описывает каждую тему дискретным распределением на множестве терминов, каждый документ -- дискретным распределением на множестве тем. Предполагается, что коллекция документов -- это последовательность терминов, выбранных случайно и независимо из смеси таких распределений, и ставится задача восстановления компонент смеси по выборке.\\
+Одним из основных приложений тематического моделирования является информационный поиск \cite{inforetr}. Cовременные поисковые алгоритмы основаны на инвертированных индексах, за счёт которых система ищет документы, содержащие все слова запроса, поэтому скорее всего будет найдено очень мало документов. Тематический или разведочный поиск это разновидность информационного поиска. Основная его идея состоит в построении тематической модели текста запроса, извлечении тем и дальнейшего поиска по данным темам. Фактически для поиска документов используются те же механизмы обратного индексирования, только словами считаются темы представленные в документах. Новые технологии информационного поиска на основе тематического моделирования в настоящее время активно разрабатываются \cite{inforetrtm1, inforetrtm2}.\\
+Тематическое моделирование также применяется для определения трендов в новостных потоках или научных работах  \cite{textflow1, textflow2}, для многоязычного информационного поиска  \cite{multilang1, multilang2}, при анализе структур социальных сетей \cite{socnet1, socnet2},  в задачах классификации, кластеризации и категоризации документов \cite{tmtask1, tmtask2}, для тематической сегментации текстов \cite{segtask}, при построении рекомендательных систем\cite{recsys1, recsys2}.
 	\subsection{О методах вероятностного тематического моделирования}
+Для  задачи вероятностоного тематического моделирования  классическим решением является вероятностный латентный семантический анализ (Probabilistic Latent Semantic Analysis, PLSA). Модель  была предложена Томасом Хофманном в 1999 году \cite{plsadef2}. Одним из недостатков этой модели является то, что она задаёт закон порождения слов в документах, но не закон порождения самих документов \cite{plsaminus}. Также было неясно как оценивать слова, ранее не встречавшиеся в коллекции. Поэтому в 2003 году была предложена модель Латентного Размещения Дирихле (Latent Dirichlet Allocation, LDA) \cite{ldadef1}, лишённая данных недостатков. В LDA предполагается, что каждое слово в документе порождено некоторой латентной темой, при этом в явном виде моделируется распределение слов в каждой теме, а также априорное
+распределение тем в документе. С тех пор было предложено множество моделей, базирующихся на данном подходе, которые постепенно усложняли вероятностную модель за счёт учёта связей между документами \cite{connect1, connect2, connect3}, метаданных о документах \cite{metadata} и информации о порядке слов в документе \cite{order1, order2}.\\
+Данные модели объединяет общая схема. Сначала вводится вероятностная модель коллекции документов, а затем оценивается  апостериорное распределение  параметров. Для этого существует набор основных алгоритмов. Ниже приводится их краткий обзор.\\
+EM-алгоритм (Expectation-Maximization) \cite{baseem} обычно используется для  точного оценивания параметров. Например, он используется для решения задачи PLSA. Основными недостатками данного метода являются быстрый рост количества параметров по числу слов, тем и документов, а также большое число локальных максимумов у функции правдоподобия. Однако, точное оценивание апостериорных распределений скрытых параметров может быть вычислительно неэффективным. В этом случае используются вариационные методы \cite{basevar}, которые являются специальной версией EM-алгоритма. Эти методы позволяют оценивать узкие нижние и верхние доверительные границы для значений скрытых переменных в наблюдаемом документе. Эти методы обладают теми же недостатками, что и исходный ЕМ-алгортим.\\
+Методы Монте-Карло для марковских цепей (Markov chain Monte Carlo, MCMC) \cite{mcmc1, mcmc2} широко используются как эффективные приближенные процедуры генерации значений из распределений высоких размерностей. Одной из таких процедур является сэмплирование Гиббса \cite{gibbs}.  Оно применяется, когда вычисление или хранение функции распределения слишком ресурсоёмко, а генерация случайной выборки из этого распределения нет. Тогда исходное распределение заменяется несмещённой эмпирическая оценкой, полученной по выборке, сэмплированной из данного распределения. Важным недостатком подобных методов является время их работы: чтобы получить хорошее приближение распределения, требуется сэмплировать много объектов, что может быть трудоёмко. \\
+Чтобы обойти обозначенные недостатки описанных алгоритмов, а также тот факт, что каждый раз приходится перестраивать вероятнстную модель и заново строить байесовский вывод, и в итоге получить простую, но гибкую и легко расширяемую модель для вероятностного тематического моделирования, был предложен подход Аддитивной Регуляризации Тематических моделей (Additive Regularization For Topic Models, ARTM) \cite{artmdef1, artmdef2, artmdef3}. Это многокритериальный подход, в котором к основному критерию добавляется взвешенная сумма регуляризаторов.  За счёт аддитивности, оптимизация любых моделей и их комбинаций производится одним и тем же итерационным процессом. Для добавления регуляризатора в модель достаточно знать его частные производные по параметрам модели. Таким образом, ARTM --  это не ещё одна тематическая модель, а общий подход к построению и комбинированию многих тематических моделей. \\
+Однако, открытым остаётся вопрос о сходимости предложенного в рамках ARTM алгоритма. Известно, что на практике алгоритм сходится, тем не менее, теоретического обоснования алгоритма не было предложено. Итерации алгоритма ARTM можно проинтерпретировать как итерации Generalized Expectation Maximization (GEM) алгоритма \cite{basegem} в случае наличия априорного распределения. Условия сходимости GEM алгоритмов хорошо изучены \cite{wuem}, их можно перенести их на алгоритм ARTM и получить ограничения на регуляризаторы.
+
 	\subsection{Цель работы}
+	Вопрос об условиях сходимости алгоритма ARTM является открытым, поэтому данная работа посвящена исследованию данной проблемы. Целями работы являются:
+\begin{enumerate}
+\item Изучение свойств сходимости алгоритма ARTM. 
+\item Поиск условий на регуляризаторы, способствующих сходимости. Требуется, чтобы данные условия легко проверялись для регуляризатора, а также чтобы выполнялись на практике для применяемых регуляризаторов.
+\item Анализ возможных модификаций алгоритма, улучшающих его сходимость.
+\item Проведение эксперимента для проверки выполнения полученных условий, а также сравнения предложенных модификаций и стандартного алгоритма ARTM.
+\end{enumerate}
 
 	\section{Аддитивная регуляризация тематических моделей}
-
+В данной главе будут введены используемые в работе обозначения, описаны основные алгоритмы, используемые при решении задачи вероятностного тематического моделирования, приведён краткий вывод алгоритма ARTM, а также будет проведено сравнение разных подходов c ARTM с целью преимуществ последнего.
 	\subsection{Классическая тематическая модель}
 \subsubsection{Постановка задачи и обозначения}
 \label{subsec:denotes}
-Для  задачи вероятностоного тематического моделирования применяется  классическим решением является вероятностный латентный семантический анализ (Probabilistic Latent Semantic Analysis, PLSA). Модель предложена Томасом Хофманном в 1999 году \cite{plsadef2}. Введём обозначения, которые будут использоваться далее в работе.\\
 Пусть $D$ -- множество (коллекция) текстовых документов, $W$ -- множество (словарь) всех употребляемых в них терминов (слов или словосочетаний). Каждый документ $d \in D$ представляет собой последовательность $n_d$ терминов $(w_1, . . . , w_{n_d})$ из словаря $W$. Термин может повторяться в документе много раз.
 Пусть существует конечное множество тем $T$, и каждое употребление термина $w$ в каждом документе $d$ связано с некоторой темой $t \in T$, которая не известна. Формально тема определяется как дискретное (мультиномиальное) вероятностное распределение в пространстве слов заданного словаря $W$.\\
 Введем дискретное вероятностное пространство $D \times W \times T$. Тогда коллекция документов может быть рассмотрена как множество троек $(d, w, t)$, выбранных случайно и независимо из дискретного распределения $p(d, w, t)$. При этом документы $d \in D$ и термины $w \in W$ являются наблюдаемыми переменными, тема $t \in T$ является латентной (скрытой) переменной.\\
@@ -222,7 +240,7 @@ $\theta_{td} = \frac{n_{dt}}{n_{d}}$\\
 \item Алгоритм PLSA не позволяет управлять разреженностью. Действительно, если в начале работы алгоритма $\phi_{wt} = 0$ или $\theta_{td} = 0$, то и после завершения работы алгоритма значения этих параметров останется равным 0. Для борьбы с этим недостатком используют регуляризацию и постепенное разреживание.
 \end{enumerate}
 	\subsection{Добавление регуляризатора}
-Для решения проблемы неединственности и неустойчивости используется регуляризация. На искомое решение накладываются дополнительные ограничения. Подход Аддитивной Регуляризации Тематических Моделей  (Additive Regularization of Topic Models, ARTM) \cite{artmdef1, artmdef2, artmdef3} основан на идее многокритериальной регуляризации. Он позволяет строить модели, удовлетворяющие многим ограничениям одновременно. Каждое ограничение формализуется в виде регуляризатора -- оптимизационного критерия $R_i(\Phi,\Theta)\to\max$, зависящего от параметров модели. Взвешенная сума всех таких критериев $R(\Phi,\Theta) = \sum_{i=1}^k \tau_i R_i(\Phi,\Theta)$ максимизируется совместно с основным критерием правдоподобия.
+Для решения проблемы неединственности и неустойчивости используется регуляризация. На искомое решение накладываются дополнительные ограничения. Подход ARTM \cite{artmdef1, artmdef2, artmdef3} основан на идее многокритериальной регуляризации. Он позволяет строить модели, удовлетворяющие многим ограничениям одновременно. Каждое ограничение формализуется в виде регуляризатора -- оптимизационного критерия $R_i(\Phi,\Theta)\to\max$, зависящего от параметров модели. Взвешенная сума всех таких критериев $R(\Phi,\Theta) = \sum_{i=1}^k \tau_i R_i(\Phi,\Theta)$ максимизируется совместно с основным критерием правдоподобия.
 \[
 \sum_{d\in D} \sum_{w\in d} n_{dw}\log \sum_{t\in T} \phi_{wt}\theta_{td} \;+\; R(\Phi,\Theta)\;\to\; \max_{\Phi,\Theta},
 \]
@@ -603,7 +621,7 @@ KL(p_{tdw}^{k}||p_{tdw}^{k+1}) \to 0 \text{ при } n \to \infty.
 \right.
 \]
 Будем оценивать изменения функционалов отдельно по данным этапам. Для начала проанализируем эти этапы. На первом шаге происходит переход в точку $\left(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\right)$, а затем проводится максимизация $R$. Как говорилось в главе \ref{subsec:artmasgem}, есть две естественные формулы для регуляризационных добавок. Напомним их на примере $r_{wt}$. В первом случае $r_{wt} = \tau\phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}} \left( \phi_{wt}, \theta_{td}\right)$, а во втором $\phi_{wt} = \frac{n_{wt}}{n_t} \frac{\partial{R}}{\partial{\phi_{wt}}} \big(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\big)$. Первый способ предлагает определить добавку в начальной точке и потом её использовать, второй способ определяет добавку уже в новой точке. Понятно, что второй способ формально должен лучше максимизировать $R$, так как он выбирает добавку по более актуальной информации. Для первого варианта не удалось провести анализ, так как неясно как связаны градиент в точке $(\phi_{wt}, \theta_{td})$ и $\left(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\right)$. Для второго варианта анализ оказался успешнее.\\
-Введём новую функцию $R^{\prime}$ зависящую от $n_{wt}$ следующим образом: $R^{\prime}(n_{wt}, n_{td}) = R\left( \frac{n_{wt}}{\sum\limits_w n_{wt}},  \frac{n_{td}}{\sum\limits_t n_{td}}\right)$. Также введём обозначение $g_{wt}$ для $\frac{\partial{R^{\prime}}}{\partial{n_{wt}}}$ и $g_{td}$ для $\frac{\partial{R^{\prime}}}{\partial{n_{td}}}$. Обратим внимание, что это функции. Для этих величин справедлива следующее утверждение:
+Введём новую функцию $R^{\prime}$ зависящую от $n_{wt}$ следующим образом: $R^{\prime}(n_{wt}, n_{td}) = R\left( \frac{n_{wt}}{\sum\limits_w n_{wt}},  \frac{n_{td}}{\sum\limits_t n_{td}}\right)$. Также введём обозначение $g_{wt}$ для $\frac{\partial{R^{\prime}}}{\partial{n_{wt}}}$ и $g_{td}$ для $\frac{\partial{R^{\prime}}}{\partial{n_{td}}}$. Обратим внимание, что это функции. Для этих величин справедливо следующее утверждение:
 \begin{claim}
 \label{claimgradientvalue}           
 Для $g_{wt}$ и $g_{td}$ выполнено
@@ -640,10 +658,10 @@ $\phi_{wt} = \frac{n_{wt}}{\sum_w n_{wt}}$, поэтому
 \sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)  \tau \frac{\partial{R}}{\partial{\phi_{wt}}} \phi_{wt} \phi_{ut}  = \sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{ut}}}  -  \frac{\partial{R}}{\partial{\phi_{wt}}}  \bigg)  \tau \frac{\partial{R}}{\partial{\phi_{ut}}} \phi_{wt} \phi_{ut} = 
 \]
 \[
-= \sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)  \tau \big(-\frac{\partial{R}}{\partial{\phi_{ut}}}\big) \phi_{wt} \phi_{ut} = 
+= \sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)  \tau \left(-\frac{\partial{R}}{\partial{\phi_{ut}}}\right) \phi_{wt} \phi_{ut} = 
 \]
 \[
-= \frac12 \bigg(\sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)  \tau \frac{\partial{R}}{\partial{\phi_{wt}}} \phi_{wt} \phi_{ut} +  \sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)  \tau \big(-\frac{\partial{R}}{\partial{\phi_{ut}}}\big) \phi_{wt} \phi_{ut} \bigg)= 
+= \frac12 \bigg(\sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)  \tau \frac{\partial{R}}{\partial{\phi_{wt}}} \phi_{wt} \phi_{ut} +  \sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)  \tau \left(-\frac{\partial{R}}{\partial{\phi_{ut}}}\right) \phi_{wt} \phi_{ut} \bigg)= 
 \]
 \[
 = \frac12 \tau \sum\limits_{t, w, u}  \frac{1}{n_{t}} \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)^2 \phi_{wt} \phi_{ut} = \tau \sum\limits_{t, w < u}  \frac{1}{n_{t}} \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)^2 \phi_{wt} \phi_{ut} \geq 0
@@ -655,7 +673,7 @@ $\phi_{wt} = \frac{n_{wt}}{\sum_w n_{wt}}$, поэтому
 \[
 =\frac{1}{n_t} \bigg( \frac{\partial{R}}{\partial{\phi_{wt}}} - \frac{\partial{R}}{\partial{\phi_{wt}}} \sum_{u} \phi_{ut} \bigg)  = \frac{1}{n_t} \bigg( \frac{\partial{R}}{\partial{\phi_{wt}}} - \frac{\partial{R}}{\partial{\phi_{wt}}} \bigg) = 0
 \]
-Значит, градиент нулевой -- противоречие. Значит, равенство строгое и угол острый.
+Значит, градиент нулевой -- противоречие. Значит, неравенство строгое и угол острый.
 \end{Proof}\ \\
 \ \\
 В главе \ref{subsec:unboundreg}, что при определённых условиях на регуляризатор занулений не будет, начиная с некоторой итерации. Таким образом, если коэффициент $\tau$ не слишком большой, то на регуляризационном преобразовании будет происходить увеличение $R$ в силу малого изменения $n_{wt}$.\\
@@ -738,10 +756,11 @@ r_{wt} \propto \frac{\partial{R}}{\partial{\phi_{wt}}} - \sum\limits_u \phi_{ut}
 Приведём простой пример того, как можно управлять коэффициентами регуляризации. Давайте, следить за тем, чтобы $Q^{\prime}_n$ всегда увеличивалось, а в случае, если оно не увеличивается, будем уменьшать $\tau_n$ (например домножением на 0.95).
 
 	\section{Практические исследования}
+Данная глава повсящена экспериментом, проведённых с целью выполнения полученных условий сходимость, а также сравнения двух предложенных модификаций (несмещённой и градиентной) и стандартного алгоритма ARTM. В конце будут сделаны выводы о полученных результатах.
 \subsection{Используемая коллекция данных}
 Для экспериментов была нужна достаточно большая коллекция документов, с заранее известным  и небольшим числом тем. 20Newsgroup не подошла, так как там слишком мало документов, Википедия не подошла поскольку содержит слишком много тем. Поэтому была собрана собственная коллекция документов. Были скачены статьи с спортивного сайта sports.ru по разным видам спорта, темой документа считался вид спорта. Получившаяся коллекция документов состоит из 7 спортивных направлений примерно по 3000 статей в каждом. Также была проведена лемматизация текста и удаление стоп слов. Итоговые параметры коллекции: $|W| = 18831,~|D| = 21001,~|T| = 7$.
 	\subsection{Сравниваемые алгоритмы}
-Было проведено сравнение трёх алгоритмов: стандартного, несмещённой модификации М-шага и градиентной модификации М-шага. Приведём описание данных алгоритмов.
+Было проведено сравнение трёх алгоритмов: стандартного, несмещённой модификации М-шага и градиентной модификации М-шага. Приведём описание используемых алгоритмов.
 \begin{rusalgorithm}[H]
 \caption{ARTM. Стандартный М-шаг}\label{malgo1}
 \begin{algorithmic}[]
@@ -775,7 +794,7 @@ r_{wt} \propto \frac{\partial{R}}{\partial{\phi_{wt}}} - \sum\limits_u \phi_{ut}
 \EndProcedure
 \end{algorithmic}
 \end{rusalgorithm}
-
+\newpage
 
 
 \begin{rusalgorithm}[H]
@@ -795,7 +814,7 @@ r_{wt} \propto \frac{\partial{R}}{\partial{\phi_{wt}}} - \sum\limits_u \phi_{ut}
 \EndProcedure
 \end{algorithmic}
 \end{rusalgorithm}
-\newpage
+
 \begin{rusalgorithm}[H]
 \caption{ARTM. Е-шаг}\label{malgo4}
 \begin{algorithmic}[]
@@ -997,7 +1016,7 @@ $\exists N\ \forall k > N\colon\ \ Q^k (\phi^k, \theta^k)+ R(\Phi^k, \Theta^k) \
 	\bibitem{plsadef2}
 		Thomas Hofmann. Probilistic latent semantic analysis, Proceedings of the Twenty-Second Annual International SIGIR Conference on Research and Development in Information Retrieval, 1999.
 	\bibitem{ldadef1}
-		David M. Blei, Andrew Ng, Michael Jordan. Latent Dirichlet allocation, Journal of Machine Learning Research,  2003
+		David M. Blei, Andrew Ng, Michael Jordan. Latent Dirichlet allocation, Journal of Machine Learning Research,  2003.
 	\bibitem{artmdef1}
 		Vorontsov K. V. Additive Regularization for Topic Models of Text Collections, Doklady Mathematics, 2014.
 	\bibitem{artmdef2}
@@ -1007,8 +1026,64 @@ $\exists N\ \forall k > N\colon\ \ Q^k (\phi^k, \theta^k)+ R(\Phi^k, \Theta^k) \
 	\bibitem{ldaonline1}
 		Hoffman M. D., Blei D. M., Bach F. R. Online learning for latent dirichlet allocation, NIPS, Curran Associates, Inc., 2010.
 	\bibitem{wuem}
-		C. F. Jeff Wu. On the Convergence Properties of the EM Algorithm, The Annals of Statistics, 1983
+		C. F. Jeff Wu. On the Convergence Properties of the EM Algorithm, The Annals of Statistics, 1983.
 	\bibitem{pinsker}
-		F. Topsøe. Some inequalities for information divergence and related measures of discrimination. IEEE Transactions on Information Theory, 46(9):1602–1609, 2000
+		F. Topsøe. Some inequalities for information divergence and related measures of discrimination. IEEE Transactions on Information Theory, 46(9):1602–1609, 2000.
+	\bibitem{inforetr}
+		Andrzejewski D., Buttler D. Latent topic feedback for information retrieval. Proceedings of the 17th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, KDD, 2011.
+	\bibitem{inforetrtm1}
+		Blei D., Lafferty J. A correlated topic model of Science. Annals of Applied Statistics, 2007.
+	\bibitem{inforetrtm2}
+		Bolelli L., Ertekin S., Giles C. L. Topic and trend detection in text collections using latent dirichlet allocation, ECIR, 2009.
+	\bibitem{textflow1}
+		W. Cui, S. Liu, L. Tan, C. Shi, Y. Song, Z. Gao, H. Qu, X. Tong. TextFlow: Towards better understanding of evolving topics in text, IEEE transactions on visualization and computer graphics, 2011.
+	\bibitem{textflow2}
+		Zhang J., Song Y., Zhang C., Liu S. Evolutionary hierarchical Dirichlet processes for multiple correlated time-varying corpora, Proceedings of the 16th ACM SIGKDD international conference on Knowledge discovery and data mining, 2010.
+	\bibitem{multilang1}
+		Vuli´c I., Smet W., Moens M.-F. Cross-language information retrieval models based on latent topic models trained with document-aligned comparable corpora, Information Retrieva, 2012.
+	\bibitem{multilang2}
+		 Wallach H., Mimno D., McCallum A. Rethinking LDA: Why priors matter, Advances in Neural Information Processing Systems 22: 23rd Annual Conference on Neural Information Processing Systems, 2009.
+	\bibitem{socnet1}
+		Varshney D., Kumar S., Gupta V. Modeling information diffusion in social networks using latent topic information,  Springer International Publishing, 2014.
+	\bibitem{socnet2}
+		Zhao X. W., Wang J., He Y., Nie J.-Y., Li X. Originator or propagator?: Incorporating social role
+theory into topic models for Twitter content analysis, CIKM, 2013.
+	\bibitem{tmtask1}
+		Rubin T. N., Chambers A., Smyth P., Steyvers M. Statistical topic models for multi-label document classification, Machine Learning, 2012.
+	\bibitem{tmtask2}
+		Zhou S., Li K., Liu Y. Text categorization based on topic model, International Journal of Computational Intelligence Systems,  2009.
+	\bibitem{segtask}
+		Wang H., Zhang D., Zhai C. Structural topic model for latent topical structure analysis, Proceedings of the 49th Annual Meeting of the Association for Computational Linguistics: Human Language Technologies, 2011.
+	\bibitem{recsys1}
+		Yin H., Cui B., Chen L., Hu Z., Zhang C. Modeling location-based user rating profiles for personalized recommendation, ACM Transactions of Knowledge Discovery from Data, 2015.
+	\bibitem{recsys2}
+		Yin H., Cui B., Sun Y., Hu Z., Chen L. Lcars: A spatial item recommender system, ACM Transaction on Information Systems,  2014.
+	\bibitem{plsaminus}
+		Ali Daud, Juanzi Li, Lizhu Zhou, Faqir Muhammad. Knowledge discovery through directed probabilistic topic models: a survey, Frontiers of Computer Science in China, 2010.
+	\bibitem{connect1}
+		 Cohn D, Hofmann T. The missing link- a probabilistic model of document content and hypertext connectivity, NIPS, 2001
+	\bibitem{connect2}
+		McCallum A, Corrada-Emmanuel A, Wang X. The author-recipient- topic Model for Topic and Role Discovery in Social Networks: Experiments with Enron and Academic Email, Technical Report UM-CS-2004-096, 2004.
+	\bibitem{connect3}
+		Nallapati R, Cohen W. Link-PLSA-LDA: A new unsupervised model for topics and influence of blogs, Proceedings of International Conference for Weblogs and Social Media, Seattle, 2008.
+	\bibitem{metadata}
+	Steyvers M, Smyth P, Rosen-Zvi M, Griffiths T. Probabilistic author-topic models for information discovery. Proceedings of the 10th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, 2004
+	\bibitem{order1}
+		Gruber A, Rosen-Zvi M, Weiss Y. Hidden topic Markov models, Proceedings of Artificial Intelligence and Statistics, 2007
+	\bibitem{order2}
+		 Wallach J M. Topic modeling: Beyond bag-of-words. Proceedings of 23rd International Conference on Machine Learning, 2006
+	\bibitem{baseem}
+		Bilmes J A. A gentle tutorial of the EM algorithm and its application to parameter estimation for Gaussian mixture and hidden Markov modals, ICSI TR-97-021, 1997.
+	\bibitem{basevar}
+		Jordan M I, Ghahramani Z, Jaakkola T S, Saul L K. An introduction to variational methods for graphical models. Learning in Graphical Models. MIT Press, 1998
+	\bibitem{mcmc1}
+		Gilks W R, Richardson S, Spiegelhalter D J. Markov Chain Monte Carlo in Practice, London: Chapman  Hall, 1996.
+	\bibitem{mcmc2}
+		Andrieu C, Freitas N D, Doucet A, Jordan M. An introduction to MCMC for machine learning, Journal of Machine Learning, 2003.
+	\bibitem{gibbs}
+		Steyvers M., Griffiths T. Finding scientific topics, Proceedings of the National Academy of Sciences,  2004.
+	\bibitem{basegem}
+		Dempster A. P., Laird N. M. and Rubin D. B. Maximum likelihood from incomplete data via the EM algorithm (with discussion). J. Roy. Statist. Soc.Ser. 1977
 	\end{thebibliography}
+
 \end{document}
