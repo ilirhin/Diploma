@@ -2,12 +2,15 @@
 \usepackage{cmap}
 \usepackage [utf8]{inputenc}
 \usepackage[russian]{babel}
+\usepackage[backend=bibtex]{biblatex}
+\bibliography{DipBib}
 \usepackage[T2A]{fontenc}
 \usepackage{cmap}
 \newsavebox{\longestsec}
-
 \usetheme{Madrid}
 \useoutertheme{tree}
+\usepackage{epstopdf}
+\DeclareGraphicsExtensions{.eps} 
 
 \newtheorem{mdefinition}{Определение}[section]
 \newtheorem{mremark}{Примечание}[subsection]
@@ -24,14 +27,14 @@
 \DeclareMathOperator{\diag}{diag}
 \DeclareMathOperator{\norm}{norm}
 
-\title{Численные методы вероятностного тематического моделирования.}
-\date{12 апреля 2016}
+\title{Сходимость численных методов вероятностного тематического моделирования.}
+\date{22 июня 2016}
 \author{Ирхин Илья Александрович}
 
 \institute{
  Кафедра анализа данных \\
     \vspace{0.7cm}
-    Научный руководитель:  Воронцов Константин Вячеславович \\
+    Научный руководитель:  д.ф.-м.н. Воронцов Константин Вячеславович \\
     \vspace{0.7cm}
 }
 
@@ -68,17 +71,12 @@
 
 		\begin{frame}
 		\frametitle{Подход ARTM (Additive Regularization for Topic Modeling)}
-		Задача максимизации $\log$ правдоподобия \textcolor{red}{с регуляризатором $R$}:
+		Задача максимизации $\log$ правдоподобия \textcolor{red}{с регуляризатором $R$}\footfullcite{artmdef2}:
 \[
 \sum_{d, w} n_{dw} \log \sum_{t} \phi_{wt} \theta_{td}  + \textcolor{red}{R(\Phi, \Theta)}\to \max_{\Phi, \Theta},
 \]
 
 		Применив теорему Каруша-Куна-Такера, получим систему уравнений на переменные $\phi$ и $\theta$. Решение данной системы методом простых итераций даст ЕМ алгоритм.
-
-\vfill\medskip\hrule\smallskip\footnotesize
-    \emph{Vorontsov\;K.\,V., Potapenko\;A.\,A.}
-    Additive Regularization of Topic Models // 
-    Machine Learning. Vol. 101, Issue 1 (2015), Pp. 303--323.
 
 \end{frame}
 
@@ -97,31 +95,29 @@
 \ \ \ \ $n_{td} = \sum\limits_{w} n_{dw} p_{tdw}$,\ \ \  \ $r_{td} =  \theta_{td}\dfrac{\partial R}{\partial\theta_{td}}$,\ \ \ \ \ $\theta_{td} = \norm_t  \big(n_{td} + r_{td}\big)$
     \ \\
     \ \\
-	где $norm_y(x) = \frac{(x)_{+}}{\sum\limits_y (x)_{+}}$, и $(x)_{+} = \max(x, 0)$.
+	где $norm_y(x) = \frac{(x)_{+}}{\sum\limits_y (x)_{+}}$, и $(x)_{+} = \max(x, 0)$\footfullcite{artmdef3}.
 
-\vfill\medskip\hrule\smallskip\footnotesize
-    \emph{Vorontsov\;K.\,V., Potapenko\;A.\,A.}
-    Additive Regularization of Topic Models // 
-    Machine Learning. Vol. 101, Issue 1 (2015), Pp. 303--323.
 
 	\end{frame}
 
 	\section{Исследование сходимости ARTM}
-	\subsection{Постановка задачи}
+	\subsection{Цели работы}
 	
 	\begin{frame}
-		\frametitle{Поставленные задачи}
+		\frametitle{Цели работы}
+
 \begin{enumerate}
-\item Исследовать сходимость регуляризованного ЕМ-алгоритма
-\itemПолучить конструктивные ограничения на регуляризаторы.
-\item Предложить способы улучшения сходимости алгоритма.
+\item Изучение свойств сходимости алгоритма ARTM. 
+\item Поиск конструктивных условий на регуляризаторы, способствующих сходимости.
+\item Анализ возможных модификаций алгоритма, улучшающих его сходимость.
+\item Проведение эксперимента для проверки выполнения полученных условий, а также сравнения предложенных модификаций и стандартного алгоритма ARTM.
 \end{enumerate}
 	\end{frame}
 
 	\subsection{Полученные результаты}
 	
 	\begin{frame}
-		\frametitle{Результаты}
+		\frametitle{Основная теорема о сходимости}
 \footnotesize{
 Под $x^k$ понимается значение $x$ на $k$-ой итерации. Пусть выполнены следующие условия:
 \begin{enumerate}
@@ -155,11 +151,11 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 	
 
 	\section{Улучшения сходимости}
-	\subsection{Замена формулы М-шага}
+	\subsection{Модификации М-шага}
 	
 	\begin{frame}
 		\frametitle{Несмещённые оценки в  М-шаге}
-Для доказательства условия №7 (увеличение $Q^k+R$ на итерациях) предлагается заменить все вхождения $\phi_{wt}$ и $\theta_{td}$ на их несмещённые оценки $\frac{n_{wt}}{n_t}$ и $\frac{n_{td}}{n_d}$
+Для доказательства условия №7 (увеличение $Q^k+R$ на каждой итерации) предлагается заменить все вхождения $\phi_{wt}$ и $\theta_{td}$ на их несмещённые оценки $\frac{n_{wt}}{n_t}$ и $\frac{n_{td}}{n_d}$
 \[
 \left\{
 	\begin{aligned}
@@ -170,7 +166,6 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 \]
 	\end{frame}
 
-	\subsection{Уточнение градиента изменения}
 	
 	\begin{frame}
 		\frametitle{Уточнение градиента изменения}
@@ -183,7 +178,7 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 	\end{aligned}
 \right.
 \]
-Где $A_t$ и $B_d$ -- коэффициенты, зависящие только от темы(документа). Эту добавку можно эффективно вычислить, поскольку второе слагаемое одникаковое для всех слов (тем) в рамках одной темы(документа) .
+Где $A_t$ и $B_d$ -- коэффициенты, зависящие только от темы(документа). Эту добавку можно эффективно вычислить, поскольку второе слагаемое одникаковое для всех слов (тем) в рамках одной темы (документа).
 	\end{frame}
 
 \begin{frame}
@@ -195,7 +190,7 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 \[
 \frac{\partial{R}}{\partial{n_{td}}} = \frac{1}{n_d} \bigg( \frac{\partial{R}}{\partial{\theta_{td}}} - \sum\limits_s \theta_{sd} \frac{\partial{R}}{\partial{\theta_{sd}}} \bigg)
 \]
-Для стандартной формулы преобразования можно показать, что угол с данным градиентом всегда острый, что гарантирует увеличение $R$. Тем не менее, очевидно, что наибольшее увеличение будет давать именно изменение вдоль градиента.
+Для стандартной формулы преобразования можно показать, что угол с данным градиентом всегда острый, что гарантирует увеличение $R$. Тем не менее, очевидно, что наибольшее локальное увеличение будет давать именно изменение вдоль градиента.
 	\end{frame}
 
 \begin{frame}
@@ -215,8 +210,8 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 	\end{frame}
 
 \begin{frame}
-		\frametitle{Пример регуляризатора}
-Пусть $R = -\tau \sum\limits_{w, t} \phi_{wt}$. Формально он не должен влиять на оптимизацию, поскольку просто равен константе при ограничениях задачи. Тем не менее, исходные формулы дадут следующий М-шаг:
+		\frametitle{Отличия модификаций}
+Пусть $R = -\tau \sum_{w, t} \phi_{wt}$. Он не должен влиять на оптимизацию, поскольку просто равен константе при ограничениях задачи. Тем не менее, исходные формулы дадут следующий М-шаг:
 \[
 \left\{
 	\begin{aligned}
@@ -225,7 +220,7 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 	\end{aligned}
 \right.
 \]
-Что явно не похоже на PLSA. По новой же формуле получится, что 
+Что отличается от итерационного процесса для  PLSA. По формуле градиентной модификации получится, что 
 \[
 \frac{\partial{R}}{\partial{\phi_{wt}}} - \sum\limits_u \phi_{ut} \frac{\partial{R}}{\partial{\phi_{ut}}} = \tau - \tau =0
 \]
@@ -239,40 +234,73 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 		
 \begin{enumerate}
 \item В качестве регуляризатора был взят регуляризатор декоррелирования ($R = -\tau\sum\limits_w \sum\limits_{t \neq s} \phi_{wt} \phi_{ws}$).
-\item Были проверены три случая величины $\tau$: малый($10^4$), средний($10^6$), большой($10^8$) .
-\item Использовались статьи со спортивного сайта sports.ru по 6 тематикам.  Планируются эксперименты на более популярных коллекциях.
+\item Были проверены четыре случая величины $\tau$: $10^5,~10^6,~10^7,~10^8$, для разного числа тем: 3, 10, 30.
+\item Использовались статьи со спортивного сайта sports.ru по 7 видам спорта.
 \item Проверялись стандартная формула, замена несмещёнными оценками и градиентное преобразование.
-\item Алгоритм запускался из 200 случайных начальных приближений и в итоге были получены траектории средних значений функционалов в зависимости от номера итерации.
+\item Алгоритм  запускался из случайных начальных приближений, одинаковых для всех запусков, после чего сравнивались средние значения целевых метрик.
 \end{enumerate}
 
 	\end{frame}
 
 	\begin{frame}
-		\frametitle{Результаты $\tau=10^4$}
-		{
-		\center{\includegraphics[scale=0.19]{LR5}
-		\includegraphics[scale=0.19]{LR5_tail}}\\
-		
-		\center{\includegraphics[scale=0.19]{R5}}\\
-		}
-При том же значении корреляции тем градиентное преобразование лучше оптимизирует регуляризированное правдоподобие.
+\begin{figure}
+	\centering   
+	\caption{Значения $L + R$. $|T| = 10$. Градиентные поправки немного хуже остальных, но при большом $\tau$ показывают ощутимо лучший результат.} 
+	\medskip
+	\includegraphics[width=0.9\linewidth]{presentation_pictures/topics_10_LR_values.eps}  
+\end{figure}
 	\end{frame}
 
 	\begin{frame}
-		\frametitle{Результаты $\tau=10^6$}
-		{\center{\includegraphics[scale=0.19]{LR6}
-		\includegraphics[scale=0.19]{LR6_tail}}\\
-		
-		\center{\includegraphics[scale=0.19]{R6}}\\}
-Градиентное преобразование немного лучше по регуляризированному правдоподобию, но жертвует величиной коррелированности тем.
+\begin{figure}
+	\centering   
+	\caption{Значения $R$. $|T| = 10$.  На верхних графиках виден скачок $R$ на первой итераций, на нижних графиках он ярче выражен. Несмещённая модификация и градиент $\times 50$  лучше всех остальных.} 
+	\medskip
+	\includegraphics[width=0.9\linewidth]{presentation_pictures/topics_10_R_values.eps}  
+\end{figure}
 	\end{frame}
-
+	
 	\begin{frame}
-		\frametitle{Результаты $\tau=10^8$}
-		{\center{\includegraphics[scale=0.25]{LR8}
-		\includegraphics[scale=0.25]{R8}}}
-		Несмещённые оценки и стандартный вариант зануляют важные эелементы $\phi$(нарушается свойство №4 из теоремы), логарифм правдоподобия резко падает. Градиентное преобразование не так категорично относится к разреживанию, поэтому оптмимизация успешно завершается, не уменьшив правдоподобие до нуля.
+\begin{figure}
+	\centering   
+	\caption{Значения $R$. $|T| = 30$. Эффект скачков уже ярко выражен при $\tau = 10^6$. Градиент $\times 50$ существенно лучше всех остальных.} 
+	\medskip
+	\includegraphics[width=0.9\linewidth]{presentation_pictures/topics_30_R_values.eps}  
+\end{figure}
 	\end{frame}
+	
+	\begin{frame}
+\begin{figure}
+	\centering
+	\caption{Изменение $R$ на M-шаге. $|T| = 10$.}    
+	\includegraphics[width=1.0\linewidth]{presentation_pictures/topics_10_RMstepDiff}
+\end{figure}
+	\end{frame}
+	
+	\begin{frame}
+\begin{figure}
+	\centering
+	\caption{Удельное изменение $R$ на M-шаге. $|T| = 10$.}    
+	\includegraphics[width=1.0\linewidth]{presentation_pictures/topics_10_RMstepDiffPerL2}
+\end{figure}
+	\end{frame}
+	
+	\begin{frame}
+\begin{figure}
+	\centering
+	\caption{Логарифм минимального ненулевого значения матрицы $\Phi$. $|T| = 10$.}    
+	\includegraphics[width=1.0\linewidth]{presentation_pictures/topics_10_minPhi_values}
+\end{figure}
+	\end{frame}
+	
+\begin{frame}{Итоги экспериментов}
+\begin{enumerate}
+\item Предположения об отделимости и невырожденности распределений выполняются на практике.
+\item С точки зрения оптимизации $L + \tau R$ все рассмотренные формулы отличаются незначительно. Основное достоинтсво предложенных модификаций в этом плане --- это теоретические гарантии.
+\item Есть эффект скачков значений функционалов на первых итерациях для стандартной формулы, вызванный выбором точки в которой считаются $r_{wt}$ и $r_{td}$.
+\item Для градиентных поправок необходимо дополнительное исследование, чтобы понять как подбирать константу перед градиентом.
+\end{enumerate}
+\end{frame}
 
 	\begin{frame}{Краткое резюме}
  \begin{enumerate}
@@ -281,25 +309,5 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 \item Предложены модификации ЕМ-алгоритма, улучшающие сходимость регуляризованного ЕМ-алгоритма.
 \end{enumerate}
 	\end{frame}
-
-\begin{frame}{Список литературы}
-\footnotesize
-\begin{thebibliography}{@@@@}
-	\bibitem{plsadef2}
-		Thomas Hofmann. Probilistic latent semantic analysis, Proceedings of the Twenty-Second Annual International SIGIR Conference on Research and Development in Information Retrieval, 1999.
-	\bibitem{ldadef1}
-		David M. Blei, Andrew Ng, Michael Jordan. Latent Dirichlet allocation, Journal of Machine Learning Research,  2003
-	\bibitem{artmdef2}
-		Vorontsov K. V., Potapenko A. A. Tutorial on Probabilistic Topic Modeling: Additive Regularization for Stochastic Matrix Factorization,  AIST’2014, Analysis of Images, Social networks and Texts. Springer International Publishing Switzerland, 2014.
-	\bibitem{artmdef3}
-		Vorontsov K. V., Potapenko A. A. Additive Regularization of Topic Models, Machine Learning Journal, 2014.
-	\bibitem{ldaonline1}
-		Hoffman M. D., Blei D. M., Bach F. R. Online learning for latent dirichlet allocation, NIPS, Curran Associates, Inc., 2010.
-	\bibitem{wuem}
-		C. F. Jeff Wu. On the Convergence Properties of the EM Algorithm, The Annals of Statistics, 1983
-	\bibitem{pinsker}
-		F. Topsøe. Some inequalities for information divergence and related measures of discrimination. IEEE Transactions on Information Theory, 46(9):1602–1609, 2000
-	\end{thebibliography}
-\end{frame}
 
 \end{document}

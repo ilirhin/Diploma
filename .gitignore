@@ -4,3 +4,13 @@
 *.gz
 *.log
 *.pdf
+*.o
+*.exe
+*.nav
+*.out
+*.snm
+*.toc
+*.bbl
+*.blg
+*.zip
+*.xml
