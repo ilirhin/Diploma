@@ -1,7 +1,8 @@
 \documentclass[utf8]{beamer}
-\usepackage{cmap}
 \usepackage [utf8]{inputenc}
 \usepackage[russian]{babel}
+\usepackage{caption}
+\usepackage{cmap}
 \usepackage[backend=bibtex]{biblatex}
 \bibliography{DipBib}
 \usepackage[T2A]{fontenc}
@@ -10,6 +11,11 @@
 \usetheme{Madrid}
 \useoutertheme{tree}
 \usepackage{epstopdf}
+\usepackage{float}
+
+
+\renewcommand{\figurename}{Fig.}
+
 \DeclareGraphicsExtensions{.eps} 
 
 \newtheorem{mdefinition}{Определение}[section]
@@ -26,6 +32,11 @@
 \DeclareMathOperator{\sign}{sign}
 \DeclareMathOperator{\diag}{diag}
 \DeclareMathOperator{\norm}{norm}
+\renewcommand{\leq}{\leqslant}
+\renewcommand{\geq}{\geqslant}
+\renewcommand{\phi}{\varphi}
+\setcounter{figure}{0}
+
 
 \title{Сходимость численных методов вероятностного тематического моделирования.}
 \date{22 июня 2016}
@@ -51,7 +62,7 @@
 	\end{frame}
 	
 	\section{Постановка задачи}
-	\subsection{Формулировка задачи}
+	\subsection{Задача вероятностного тематического моделирования}
 	
 	
 	\begin{frame}
@@ -59,75 +70,74 @@
 		\textbf{Дано:}  $p(w|d) = \frac{n_{wd}}{n_d}$ -- частоты слов $w$ в документах $d$.\\
 		\textbf{Найти:} $p(w|t)$ и $p(t|d)$ т.ч.
 		\[
-		 	p(w|d) = \sum_t p(w|t) p(t|d).
+		 	p(w|d) = \sum_t p(w|t) p(t|d) \equiv \sum_t \phi_{wt} \theta_{td}.
 		\]
 		\textbf{Критерий поиска:}  максимизация логарифма правдоподобия
 		\[
-\sum_{d, w} n_{dw} \log \sum_{t} \phi_{wt} \theta_{td} \to \max
-\]
+			\sum_{d, w} n_{dw} \log \sum_{t} \phi_{wt} \theta_{td} \to \max_{\Phi, \Theta}
+		\]
 	\end{frame}
 
 	\subsection{Подход ARTM}
 
-		\begin{frame}
+	\begin{frame}
 		\frametitle{Подход ARTM (Additive Regularization for Topic Modeling)}
 		Задача максимизации $\log$ правдоподобия \textcolor{red}{с регуляризатором $R$}\footfullcite{artmdef2}:
-\[
-\sum_{d, w} n_{dw} \log \sum_{t} \phi_{wt} \theta_{td}  + \textcolor{red}{R(\Phi, \Theta)}\to \max_{\Phi, \Theta},
-\]
+		\[
+			\sum_{d, w} n_{dw} \log \sum_{t} \phi_{wt} \theta_{td}  + \textcolor{red}{R(\Phi, \Theta)}\to \max_{\Phi, \Theta},
+		\]
 
-		Применив теорему Каруша-Куна-Такера, получим систему уравнений на переменные $\phi$ и $\theta$. Решение данной системы методом простых итераций даст ЕМ алгоритм.
-
-\end{frame}
-
-
- 
-		\begin{frame}
-		\frametitle{Подход ARTM (Additive Regularization for Topic Modeling)}   
-   \textbf{E-step:}
-    
-    \ \ \ \ $p_{tdw} = p(t|d, w) = \norm_t(\varphi_{wt} \theta_{td})$
-
-    \medskip\textbf{M-step:}
-    
-    \ \ \ \ $n_{wt} = \sum\limits_{d} n_{dw} p_{tdw}$,\ \ \ $r_{wt} =  \phi_{wt}\dfrac{\partial R}{\partial\phi_{wt}}$,\ \ \  $\phi_{wt}   = \norm_w\big(n_{wt} + r_{wt}\big)$
-
-\ \ \ \ $n_{td} = \sum\limits_{w} n_{dw} p_{tdw}$,\ \ \  \ $r_{td} =  \theta_{td}\dfrac{\partial R}{\partial\theta_{td}}$,\ \ \ \ \ $\theta_{td} = \norm_t  \big(n_{td} + r_{td}\big)$
-    \ \\
-    \ \\
-	где $norm_y(x) = \frac{(x)_{+}}{\sum\limits_y (x)_{+}}$, и $(x)_{+} = \max(x, 0)$\footfullcite{artmdef3}.
-
+		Применяя теорему Каруша-Куна-Такера, получается система уравнений на переменные $\phi$ и $\theta$. Решение данной системы методом простых итераций даёт ЕМ алгоритм.
 
 	\end{frame}
 
-	\section{Исследование сходимости ARTM}
-	\subsection{Цели работы}
+
+ 	\begin{frame}
+		\frametitle{Подход ARTM (Additive Regularization for Topic Modeling)}   
+   		\textbf{E-шаг:}	
+   		 
+   		 \qquad $p_{tdw} = p(t|d, w) = \norm_t(\varphi_{wt} \theta_{td})$ 		 
+ 		\medskip
+ 		
+ 		\textbf{M-шаг:}
+    
+ 		\qquad $n_{wt} = \sum\limits_{d} n_{dw} p_{tdw}$,\ \ \ $r_{wt} =  \phi_{wt}\dfrac{\partial R}{\partial\phi_{wt}}$,\ \ \  $\phi_{wt}   = \norm_w\big(n_{wt} + r_{wt}\big)$,
+
+ 		\qquad $n_{td} = \sum\limits_{w} n_{dw} p_{tdw}$,\ \ \  \ $r_{td} =  \theta_{td}\dfrac{\partial R}{\partial\theta_{td}}$,\ \ \ \ \ $\theta_{td} = \norm_t  \big(n_{td} + r_{td}\big)$,
+\medskip
+
+	где $norm_y(x) = \frac{(x)_{+}}{\sum\limits_y (x)_{+}}$, и $(x)_{+} = \max(x, 0)$\footfullcite{artmdef3}.	
+	\end{frame}
 	
+	\subsection{Цели работы}	
 	\begin{frame}
 		\frametitle{Цели работы}
-
-\begin{enumerate}
-\item Изучение свойств сходимости алгоритма ARTM. 
-\item Поиск конструктивных условий на регуляризаторы, способствующих сходимости.
-\item Анализ возможных модификаций алгоритма, улучшающих его сходимость.
-\item Проведение эксперимента для проверки выполнения полученных условий, а также сравнения предложенных модификаций и стандартного алгоритма ARTM.
-\end{enumerate}
+		\begin{enumerate}
+			\item Изучение свойств сходимости алгоритма ARTM. 
+			\item Поиск конструктивных условий на регуляризаторы, способствующих сходимости.
+			\item Анализ возможных модификаций алгоритма, улучшающих его сходимость.
+			\item Проведение эксперимента для проверки выполнения полученных условий, а также сравнения предложенных модификаций и стандартного алгоритма ARTM.
+		\end{enumerate}
 	\end{frame}
 
-	\subsection{Полученные результаты}
+
+	\section{Теоретические результаты}
+	\subsection{Сходимость алгоритма ARTM}
 	
-	\begin{frame}
-		\frametitle{Основная теорема о сходимости}
+\begin{frame}
+\frametitle{Основная теорема о сходимости}
 \footnotesize{
-Под $x^k$ понимается значение $x$ на $k$-ой итерации. Пусть выполнены следующие условия:
+Под $x^k$ понимается значение $x$ на $k$-ой итерации. 
+
+Пусть выполнены следующие условия:
 \begin{enumerate}
-\item  $ n^k_{wt} = 0 \Rightarrow \phi^k_{wt} = 0$ -- сохранение нуля.
-\item $n^k_{td} = 0 \Rightarrow \theta^k_{td} = 0$ -- сохранение нуля.
+\item  $ n^k_{wt} = 0 \Rightarrow \phi^k_{wt} = 0$ --- сохранение нуля.
+\item $n^k_{td} = 0 \Rightarrow \theta^k_{td} = 0$ --- сохранение нуля.
 \item $\exists \varepsilon>0\ \exists N\ \forall k > N\ \phi^k_{wt}, \theta^k_{td} \notin (0, \varepsilon)$ -- отделимость от нуля.
-\item  $ n_{dw}>0 \Rightarrow \forall k\ \exists t\colon p^k_{tdw} > 0$ -- невырожденность распределения $ p(t|d,w)$.
-\item $\exists \delta\geq 0\ \exists N\ \forall k > N \ \forall t\ \exists w\  n^k_{wt} + r^k_{wt} > \delta$ -- невырожденность $p(w|t)$.
-\item $\exists \delta\geq 0\ \exists N\ \forall k > N \ \forall d\ \exists t\  n^k_{td} + r^k_{td} > \delta$ -- невырожденность $p(t|d)$.
-\item $\exists N\ \forall k > N\colon\ \ Q^k (\phi^k, \theta^k)+ R(\phi^k, \theta^k) \geq Q^k(\phi^{k-1}, \theta^{k-1}) + R(\phi^{k-1}, \theta^{k-1})$, где $Q^k(\phi, \theta) = \sum\limits_{t,d,w} p^k_{tdw} (\ln \phi_{wt} + \ln \theta_{td})$ --  монотонное неубывание нижней оценки правдоподобия.
+\item  $ n_{dw}>0 \Rightarrow \forall k\ \exists t\colon p^k_{tdw} > 0$ --- невырожденность распределения $ p(t|d,w)$.
+\item $\exists \delta\geq 0\ \exists N\ \forall k > N \ \forall t\ \exists w\  n^k_{wt} + r^k_{wt} > \delta$ --- невырожденность $p(w|t)$.
+\item $\exists \delta\geq 0\ \exists N\ \forall k > N \ \forall d\ \exists t\  n^k_{td} + r^k_{td} > \delta$ --- невырожденность $p(t|d)$.
+\item $\exists N\ \forall k > N\colon\ \ Q^k (\phi^k, \theta^k)+ R(\phi^k, \theta^k) \geq Q^k(\phi^{k-1}, \theta^{k-1}) + R(\phi^{k-1}, \theta^{k-1})$, где $Q^k(\phi, \theta) = \sum\limits_{t,d,w} p^k_{tdw} (\ln \phi_{wt} + \ln \theta_{td})$ ---  монотонное неубывание нижней оценки правдоподобия.
 \end{enumerate}
 Тогда выполнено:
 \[
@@ -137,24 +147,22 @@ KL(p_{tdw}^{k}||p_{tdw}^{k + 1}) \to 0 \text{ при } k \to \infty.
 L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходится при } k \to \infty.
 \]
 }
-	\end{frame}
+\end{frame}
 
-	\begin{frame}
-		\frametitle{Несколько следствий}
+\begin{frame}
+\frametitle{Несколько следствий}
 \begin{enumerate}
 \item  Если в условии №5 и №6 $\delta > 0$, то $\phi^k_{wt} - \phi_{wt}^{k-1} \to 0$ и $\theta^k_{td} - \theta^{k-1}_{td} \to 0$.
-\item Все предельные точки $\phi^k_{wt}$ и $\theta^k_{td}$ -- стационарные точки $L + R$ при каком-то ограничении на множество нулевых позиций $\phi_{wt}$ и $\theta_{td}$.
+\item Все предельные точки $\phi^k_{wt}$ и $\theta^k_{td}$ -- стационарные точки $L + R$ при каком-то ограничении на множество нулевых позиций $\Phi$ и $\Theta$.
 \item Если множество стационарных точек $L + R$ дискретно, то $\phi_{wt}^k$ и $\theta_{td}^k$ сходятся к стационарной точке $L+R$.
 \item Ряд $\sum\limits_{k=1}^{\infty} (p_{tdw}^k - p_{tdw}^{k-1})^2$ сходится.
 \end{enumerate}
-	\end{frame}
+\end{frame}
 	
-
-	\section{Улучшения сходимости}
 	\subsection{Модификации М-шага}
 	
-	\begin{frame}
-		\frametitle{Несмещённые оценки в  М-шаге}
+\begin{frame}
+\frametitle{Несмещённая модификация}
 Для доказательства условия №7 (увеличение $Q^k+R$ на каждой итерации) предлагается заменить все вхождения $\phi_{wt}$ и $\theta_{td}$ на их несмещённые оценки $\frac{n_{wt}}{n_t}$ и $\frac{n_{td}}{n_d}$
 \[
 \left\{
@@ -164,14 +172,14 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 	\end{aligned}
 \right.
 \]
-	\end{frame}
+\end{frame}
 
 	
-	\begin{frame}
-		\frametitle{Уточнение градиента изменения}
-		Для улучшения сходимости предлагается использовать градиент регуляризатора в формуле М-шага.
+\begin{frame}
+\frametitle{Градиентная модификация}
+Для улучшения сходимости предлагается использовать градиент регуляризатора в формуле М-шага.
 \[
-\left\{
+\left\{\
 	\begin{aligned}
 		r_{wt} =  A_t \bigg[\textcolor{red} {\frac{\partial{R}}{\partial{\phi_{wt}}} - \sum\limits_u \phi_{ut} \frac{\partial{R}}{\partial{\phi_{ut}}} }\bigg] \bigg(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\bigg),\\
 		r_{td} =  B_d \bigg[ \textcolor{red} {\frac{\partial{R}}{\partial{\theta_{td}}} - \sum\limits_s \theta_{sd} \frac{\partial{R}}{\partial{\theta_{sd}}} }\bigg] \bigg(\frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\bigg),
@@ -179,22 +187,24 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 \right.
 \]
 Где $A_t$ и $B_d$ -- коэффициенты, зависящие только от темы(документа). Эту добавку можно эффективно вычислить, поскольку второе слагаемое одникаковое для всех слов (тем) в рамках одной темы (документа).
-	\end{frame}
+\end{frame}
+
 
 \begin{frame}
-		\frametitle{Обоснование формул}
-В точке  $\big( \frac{n_{wt}}{n_t}, \frac{n_{td}}{n_d}\big)$ можно найти градиент $R$ по $n_{wt}$ и $n_{td}$:
+\frametitle{Обоснование формул}
+Градиент $R$ по $n_{wt}$ и $n_{td}$ равен:
 \[
 \frac{\partial{R}}{\partial{n_{wt}}} = \frac{1}{n_t} \bigg(\frac{\partial{R}}{\partial{\phi_{wt}}} - \sum\limits_u \phi_{ut} \frac{\partial{R}}{\partial{\phi_{ut}}}\bigg)
 \]
 \[
 \frac{\partial{R}}{\partial{n_{td}}} = \frac{1}{n_d} \bigg( \frac{\partial{R}}{\partial{\theta_{td}}} - \sum\limits_s \theta_{sd} \frac{\partial{R}}{\partial{\theta_{sd}}} \bigg)
 \]
-Для стандартной формулы преобразования можно показать, что угол с данным градиентом всегда острый, что гарантирует увеличение $R$. Тем не менее, очевидно, что наибольшее локальное увеличение будет давать именно изменение вдоль градиента.
-	\end{frame}
+Для стандартной формулы преобразования можно показать, что угол с данным градиентом всегда острый, что гарантирует локальное увеличение $R$. Однако, наибольшее локальное увеличение даёт именно изменение вдоль градиента.
+\end{frame}
+
 
 \begin{frame}
-		\frametitle{Более подробно про острый угол градиента}
+\frametitle{Более подробно про острый угол градиента}
 
 Для упрощения будет рассмотрен случай $R(\Phi, \Theta) = R(\Phi)$.
 \[
@@ -207,10 +217,12 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 \[
 = \frac12  \sum\limits_{t, w, u}  \frac{1}{n_{t}} \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)^2 \phi_{wt} \phi_{ut}  \geq 0
 \]
-	\end{frame}
+\end{frame}
+
 
 \begin{frame}
-		\frametitle{Отличия модификаций}
+\frametitle{Отличия модификаций}
+
 Пусть $R = -\tau \sum_{w, t} \phi_{wt}$. Он не должен влиять на оптимизацию, поскольку просто равен константе при ограничениях задачи. Тем не менее, исходные формулы дадут следующий М-шаг:
 \[
 \left\{
@@ -225,12 +237,14 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 \frac{\partial{R}}{\partial{\phi_{wt}}} - \sum\limits_u \phi_{ut} \frac{\partial{R}}{\partial{\phi_{ut}}} = \tau - \tau =0
 \]
 То есть в точности PLSA.
-	\end{frame}
+\end{frame}
 
-	\subsection{Экспериментальные результаты}
+
+\section{Экпериментальные результаты}
+\subsection{Описание эксперимента}
 	
-	\begin{frame}
-		\frametitle{Эксперимент}
+\begin{frame}
+\frametitle{Описание эксперимента}
 		
 \begin{enumerate}
 \item В качестве регуляризатора был взят регуляризатор декоррелирования ($R = -\tau\sum\limits_w \sum\limits_{t \neq s} \phi_{wt} \phi_{ws}$).
@@ -239,59 +253,60 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 \item Проверялись стандартная формула, замена несмещёнными оценками и градиентное преобразование.
 \item Алгоритм  запускался из случайных начальных приближений, одинаковых для всех запусков, после чего сравнивались средние значения целевых метрик.
 \end{enumerate}
+\end{frame}
 
-	\end{frame}
-
-	\begin{frame}
-\begin{figure}
-	\centering   
-	\caption{Значения $L + R$. $|T| = 10$. Градиентные поправки немного хуже остальных, но при большом $\tau$ показывают ощутимо лучший результат.} 
+\subsection{Полученые результаты}
+\captionsetup{labelformat=simple} 
+\begin{frame}
+\begin{figure}[h]
+	\centering  	
+	\caption{Значения $L + R$. $|T| = 10$. Градиентная модификация немного хуже остальных. При большом $\tau$ показывает принципиально отличный результат.} 
 	\medskip
 	\includegraphics[width=0.9\linewidth]{presentation_pictures/topics_10_LR_values.eps}  
 \end{figure}
-	\end{frame}
+\end{frame}
 
-	\begin{frame}
-\begin{figure}
+\begin{frame}
+\begin{figure}[h]
 	\centering   
 	\caption{Значения $R$. $|T| = 10$.  На верхних графиках виден скачок $R$ на первой итераций, на нижних графиках он ярче выражен. Несмещённая модификация и градиент $\times 50$  лучше всех остальных.} 
 	\medskip
 	\includegraphics[width=0.9\linewidth]{presentation_pictures/topics_10_R_values.eps}  
 \end{figure}
-	\end{frame}
+\end{frame}
 	
-	\begin{frame}
-\begin{figure}
+\begin{frame}
+\begin{figure}[h]
 	\centering   
 	\caption{Значения $R$. $|T| = 30$. Эффект скачков уже ярко выражен при $\tau = 10^6$. Градиент $\times 50$ существенно лучше всех остальных.} 
 	\medskip
 	\includegraphics[width=0.9\linewidth]{presentation_pictures/topics_30_R_values.eps}  
 \end{figure}
-	\end{frame}
+\end{frame}
 	
-	\begin{frame}
-\begin{figure}
+\begin{frame}
+\begin{figure}[h]
 	\centering
 	\caption{Изменение $R$ на M-шаге. $|T| = 10$.}    
 	\includegraphics[width=1.0\linewidth]{presentation_pictures/topics_10_RMstepDiff}
 \end{figure}
-	\end{frame}
+\end{frame}
 	
-	\begin{frame}
-\begin{figure}
+\begin{frame}
+\begin{figure}[h]
 	\centering
 	\caption{Удельное изменение $R$ на M-шаге. $|T| = 10$.}    
 	\includegraphics[width=1.0\linewidth]{presentation_pictures/topics_10_RMstepDiffPerL2}
 \end{figure}
-	\end{frame}
+\end{frame}
 	
-	\begin{frame}
-\begin{figure}
+\begin{frame}
+\begin{figure}[h]
 	\centering
 	\caption{Логарифм минимального ненулевого значения матрицы $\Phi$. $|T| = 10$.}    
 	\includegraphics[width=1.0\linewidth]{presentation_pictures/topics_10_minPhi_values}
 \end{figure}
-	\end{frame}
+\end{frame}
 	
 \begin{frame}{Итоги экспериментов}
 \begin{enumerate}
@@ -302,12 +317,12 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 \end{enumerate}
 \end{frame}
 
-	\begin{frame}{Краткое резюме}
- \begin{enumerate}
-\item  Получены условия сходимости ЕМ-алгоритма для максимизации аддитивно регуляризованного правдоподобия в задачах тематического моделирования.
-\item Получены условия сходимости, показано, что они не являются слишком жёсткими. 
-\item Предложены модификации ЕМ-алгоритма, улучшающие сходимость регуляризованного ЕМ-алгоритма.
+\begin{frame}{Результаты, выносимые на защиту}
+\begin{enumerate}
+\item Условия для сходимости ЕМ-алгоритма ARTM, легко проверяемые и обеспечиваемые при реализациии.
+\item Две модификации формул М-шага ЕМ-алгоритма, улучшающие сходимость без увеличения вычислительной сложности.
+\item Оценки изменения значений регуляризатора и логарифма правдоподобия на итерациях для предложенных модификаций.
 \end{enumerate}
-	\end{frame}
+\end{frame}
 
 \end{document}
