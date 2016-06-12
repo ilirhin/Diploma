@@ -1,0 +1,89 @@
+\documentclass[twoside]{article}
+\usepackage{iip11}
+
+\begin{document}
+
+
+\title{Шаблон оформления тезисов доклада на~конференцию ИОИ"=11}
+\author{Автор~И.\,О.}{Автор Имя Отчество$^{1, 2}$}{author\_email@site.ru}
+\author{Соавтор~И.\,О.}{Соавтор Имя Отчество$^2$\speaker}{coauthor@site.ru}
+\organization{%
+    $^1$Город, Организация\par
+    $^2$Город, Организация}
+\Russian
+\maketitle
+
+Сборник тезисов докладов будет издан к~началу конференции.
+Тезисы доклада должны занимать ровно одну страницу на~русском языке.
+Перевод на~английский язык обязателен,
+он~должен находиться в~том же файле и~также занимать одну страницу
+(одна страница приблизительно соответствует 1800 символам).
+Программный комитет оставляет за собой право сократить текст тезисов,
+если он не умещается на одной странице.
+
+Для~каждого автора указывается фамилия с~инициалами,
+фамилия с~именем и~отчеством полностью,
+адрес электронной почты.
+Номер автора для указания аффилированных организаций ставится после отчества без пробела.
+Если авторов несколько, то желательно отметить командой \verb|\speaker| (\speaker) того автора, который будет выступать с~докладом.
+Тезисы доклада могут содержать формулы, таблицы, иллюстрации.
+Тезисы доклада не должны содержать разделов, списков, сносок, плавающих иллюстраций.
+Ссылку на грант(ы) можно указать в последней строке.
+
+Список литературы должен содержать ровно один пункт~---
+ссылку на полную версию данной статьи,
+принятую в~печать в~российском или международном рецензируемом журнале,
+либо поданную в~рецензируемый электронный журнал <<Машинное обучение и анализ данных>>
+через сайт \url{http://jmlda.org}.
+Для электронных журналов URL статьи указывается обязательно.
+Тезисы доклада могут дословно повторять аннотацию полной версии статьи, но могут и~дополнять её.
+Название тезисов доклада может совпадать с~названием статьи.
+Решение о~принятии или отклонении доклада на~конференцию ИОИ"=11
+будет приниматься Программным комитетом на~основании текста статьи.
+
+Работа поддержана грантом РФФИ \No\,00-00-00000.
+
+\begin{thebibliography}{1}
+\bibitem{author16first-word-of-the-title}
+    \emph{Автор\;И.\,О.}
+    Название статьи~//
+    Название журнала,
+    Город: Издательство, 2016.~--- С.\,5--25. %\\
+    \url{http://jmlda.org/papers/doc/2016/no1/Author2016Title.pdf}.
+\end{thebibliography}
+
+
+\title{Abstract template~--- IIP"=11}
+\author{Author~N.}{Author Name$^{1,2}$}{author\_email@site.ru}
+\author{Coauthor~N.}{Coauthor Name$^2$\speaker}{coauthor@site.ru}
+\organization{%
+    $^1$City, Institution\par
+    $^2$City, Institution}
+\English
+\maketitle
+
+The abstract should be concise and should present the aim of the work, essential results and conclusion.
+The total length of the abstract should not exceed one page, that is approximately 1800 characters.
+The abstract may contain plots, formulas and tables, in case if it helps to illustrate the results.
+The abstract should not contain sections, lists, footnotes or floating images.
+A reference to the grant can be provided in the last line.
+
+The title should include full names, e-mails and institutional affiliations for all authors. The speaker should be marked using the command \verb|\speaker| (\speaker).
+The bibliography must contain exactly one item~--- a reference to the full version of the article,
+published or accepted for publication in a peer-reviewed journal,
+or submitted to the peer-reviewed electronic journal~``Machine Learning and Data Analysis''
+through the website of the journal \url{http://jmlda.org}.
+If the full version of the article is published in an electronic journal, the URL for this article must be indicated.
+
+This research is funded by RFBR, grant 00-00-00000.
+
+\begin{thebibliography}{1}
+\bibitem{author16first-word-of-the-title}
+    \emph{Author\;N.}
+    Paper name~//
+    Journal,
+    City:~Publisher, 2016.~--- p.\,5--25.
+    \url{http://jmlda.org/papers/doc/2016/no6/Author2016Title.pdf}.
+\end{thebibliography}
+
+\end{document}
