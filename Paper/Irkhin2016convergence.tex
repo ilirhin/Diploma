@@ -41,10 +41,10 @@
 	\textbf{Methods}: We interpreted the ARTM algorithm as GEM algorithm. It gave an opportunity to transfer results about convergence of GEM algorithms to the observed. Also it helped to find possible improvements of the algorithm.
 	
 	\noindent
-	\textbf{Results} We obtained the conditions of the convergence. Informally, ARTM algorithm converges if regularizer's effect on the model is not too big, and if there is a certain consistency in setting to zero and decreasing  of the main model parameters.  We conducted an experiment which confirmed that these conditions are satisfied in practice. In addition, we proposed two modifications of the M-step, which slightly improve the convergence without increasing the computational complexity.
+	\textbf{Results}: We obtained the conditions of the convergence. Informally, ARTM algorithm converges if regularizer's effect on the model is not too big, and if there is a certain consistency in setting to zero and decreasing  of the main model parameters.  We conducted an experiment which confirmed that these conditions are satisfied in practice. In addition, we proposed two modifications of the M-step, which slightly improve the convergence without increasing the computational complexity.
 	
 	\noindent
-	\textbf{Concluding Remarks}:123
+	\textbf{Concluding Remarks}: We conducted an experiment which confirmed that the proposed conditions are satisfied in practice. In addition, the analysis of the ARTM algorithm lead us to two modifications of the M-step, which improve the convergence without increasing the computational complexity.
 		
 	\noindent
     	\textbf{Keywords}:  { text analysis; topic modeling; probabilistic latent semantic analysis; EM-algorithm; latent Dirichlet
@@ -167,7 +167,9 @@ $\phi_{wt}=\frac{n_{wt}}{n_t}$,~~$\theta_{td} = \frac{n_{dt}}{n_{d}}$
 
 
 \paragraph{Добавление регуляризатора}
+
 На оптимизационную задачу накладываются дополнительные ограничения. Подход ARTM \cite{vorontsov2014additive,vorontsov2014tutorial,vorontsov2015additive} основан на идее многокритериальной регуляризации. Он позволяет строить модели, удовлетворяющие многим ограничениям одновременно. Каждое ограничение формализуется в виде регуляризатора~--- оптимизационного критерия $R_i(\Phi,\Theta)\to\max$, зависящего от параметров модели. Взвешенная сума всех таких критериев $R(\Phi,\Theta) = \sum_{i=1}^k \tau_i R_i(\Phi,\Theta)$ максимизируется совместно с основным критерием правдоподобия.
+
 \[
 \sum_{d\in D} \sum_{w\in d} n_{dw}\log \sum_{t\in T} \phi_{wt}\theta_{td} \;+\; R(\Phi,\Theta)\;\to\; \max_{\Phi,\Theta},
 \]
@@ -193,9 +195,9 @@ $\phi_{wt}=\frac{n_{wt}}{n_t}$,~~$\theta_{td} = \frac{n_{dt}}{n_{d}}$
 \item $R = \sum\limits_{s \neq t, d} C_{st}\left( \theta_{td}  - \theta_{sd} \right)^2$~--- регуляризатор связей документов.
 \end{enumerate*}
 
-
 \section{Сходимость алгоритма ARTM}
-	В данной главе будут изложены основные теоретические результаты работы. Будут доказаны теоремы о сходимости алгоритма ARTM, используя результаты о сходимостях GEM алгоритмов. Также будет проведена оценка изменения функционалов на М-шаге алгоритма ARTM, и будут предложены возможные модификации для формулы М-шага, улучшающие оптимизацию. 
+
+В данной главе будут изложены основные теоретические результаты работы. Будут доказаны теоремы о сходимости алгоритма ARTM, используя результаты о сходимостях GEM алгоритмов. Также будет проведена оценка изменения функционалов на М-шаге алгоритма ARTM, и будут предложены возможные модификации для формулы М-шага, улучшающие оптимизацию. 
 	
 \paragraph{ARTM как GEM алгоритм}
 \label{subsec:artmasgem}
@@ -247,7 +249,7 @@ Q(\Phi, \Theta, \Phi', \Theta') \to \max_{\Phi, \Theta}.
 \]
 Эту формулу будем называть несмещённой модификацией М-шага.
 
- Таким образом, интерпретируя ARTM как итерации GEM алгоритма, можно использовать результаты о сходимости GEM алгоритма.
+Таким образом, интерпретируя ARTM как итерации GEM алгоритма, можно использовать результаты о сходимости GEM алгоритма.
 
 \paragraph{Итерации ARTM в обобщённом виде}	  
 Итерации ARTM можно записать в следующем виде: 
@@ -281,7 +283,7 @@ $\medskip\\
 
 Cформулируем теорему из данной работы, изменив обозначения под ARTM:
 \begin{Theorem} \label{Theorem_wu} 
-Пусть $\{\psi_p\}$~--- GEM последовательность, сгенерированная правилом $\psi_{p+1} \in M(\psi_p)$, где $M$~--- закмнутое point-to-set отображение. Пусть также значение $L +  R$ конечно и не уменьшается на итерациях, но при этом ограничено сверху, $|| \psi_p - \psi_{p+1}|| \to 0$, а множество стационарных точек $L +  R$ дискретно. Тогда $\psi_p$ сходится к некоторой стационарной точке $L +  R$.
+Пусть $\{(\Phi^k, \Theta^k)\}$~--- траектория итерационного процесса, сгенерированная правилом $(\Phi^{k+1}, \Theta^{k+1}) \in M((\Phi^k, \Theta^k))$, где $M$~--- закмнутое point-to-set отображение. Пусть также значение $L +  R$ конечно и не уменьшается на итерациях, но при этом ограничено сверху, $|| \phi^k_{wt} - \phi^{k+1}_{wt}|| \to 0$ и $|| \theta^k_{td} - \theta^{k+1}_{td}||\to 0$, а множество стационарных точек $L +  R$ дискретно. Тогда $(\Phi^k, \Theta^k)$ сходится к некоторой стационарной точке $L +  R$.
 \end{Theorem}
 
 Сходимость ARTM будет сведена к данной теореме, но для этого потребуется ввести новые определения.
@@ -344,13 +346,14 @@ Q(\Phi, \Theta, \Phi', \Theta') = L(\Phi, \Theta) +  R(\Phi, \Theta) + \sum\limi
 \end{Proof}
 
 \begin{Corollary}
+\label{corolary_first}
 Если в дополнение к условиям Теоремы \ref{Theorem_neighbour_zero1} $R$ сильно регулярен, а $r_{wt}$ и $r_{td}$ непрерывны, то:
 \[
 |\phi_{wt}^{k} - \phi_{wt}^{k+1}| \to 0 \text{ и } |\theta_{td}^{k} - \theta_{td}^{k+1}| \to 0
 \]
 \end{Corollary}
 \begin{Proof}
-По неравеству Пинскера \cite{topsoe2000some} $||P - Q||_1 \leq 2\sqrt{KL(P||Q)}$. Поэтому сходимость по $KL$ влечёт за собой сходимость по $l_1$ норме. Осталось заметить, что в потребованных условиях  $\phi_{wt}$ и $\theta_{td}$ являются непрерывными функциями от $p_{tdw}$. А значит, сходимость вторых влечёт за собой сходимость первых.
+По неравеству Пинскера \cite{topsoe2000some} $||A - B||_1 \leq 2\sqrt{KL(A||B)}$. Поэтому сходимость по $KL$ влечёт за собой сходимость по $l_1$ норме. Осталось заметить, что в потребованных условиях  $\phi_{wt}$ и $\theta_{td}$ являются непрерывными функциями от $p_{tdw}$. А значит, сходимость вторых влечёт за собой сходимость первых.
 \end{Proof}
 \begin{Corollary}
 В условия Следствия 1 все предельные точки $\phi$ и $\theta$ являются стационарными точками $L +  R$ при каком-то ограничении на множество нулевых позиций в матрицах $\Phi$ и $\Theta$.
@@ -363,10 +366,10 @@ Q(\Phi, \Theta, \Phi^0, \Theta^0) =  L(\Phi, \Theta) +  R(\Phi, \Theta) + \sum\l
 Поскольку $\phi^0, \theta^0$ ~--- предельная точка, то значение $Q$ уже нельзя увеличить, не изменяя сложившееся множество ненулевых позиций, а, значит, производная по $\phi$ и по $\theta$ левой части равна нулю при данном ограничении. При $\phi = \phi^0$ и $\theta = \theta^0$ KL достигает минимума, а, значит, и его производные равны нулю. Таким образом получается, что и производные $L +  R$ равны нулю, что и требовалось доказать.
 \end{Proof}
 \begin{Corollary}
-Если в дополнение к условиям Следствия 1, множество стационарных точек $L +  R$ дискретно при любом  ограничении на множество нулевых позиций в матрицах $\Phi$ и $\Theta$, то $\phi_{wt}^{k}$ и $\theta_{td}^{k}$ сходятся к стационарной точке $L +  R$ при некотором ограничении множества нулевых позиций.
+Если в дополнение к условиям Следствия \ref{corolary_first}, множество стационарных точек $L +  R$ дискретно при любом  ограничении на множество нулевых позиций в матрицах $\Phi$ и $\Theta$, то $\phi_{wt}^{k}$ и $\theta_{td}^{k}$ сходятся к стационарной точке $L +  R$ при некотором ограничении множества нулевых позиций.
 \end{Corollary}
 \begin{Proof}
-Положим $M(\phi, \theta) = \{artm(\phi, \theta)\}$, гле под $artm(\phi, \theta)$ понимается применение формул ARTM. В условиях Следствия 1 $artm$~--- непрерывное преобразование. Поэтому $M$~--- замкнутое point-to-set отображение. Остаётся заметить, что остальные условия Теоремы \ref{Theorem_wu} тоже выполнены.
+Положим $M((\Phi, \Theta)) = \{artm(\Phi, \Theta)\}$, где под $artm(\Phi, \Theta)$ понимается применение формул ARTM к матрицам $\Phi$ и $\Theta$. В условиях Следствия 1 $artm$~--- непрерывное преобразование. Поэтому $M$~--- замкнутое point-to-set отображение. Остаётся заметить, что остальные условия Теоремы \ref{Theorem_wu} тоже выполнены.
 \end{Proof}
 
 Теперь можно описать, что происходит на итерациях ARTM (в предположении увеличения $Q$). Итерации можно разбить на два этапа: селекция ненулевых позиций и оптимизация. На первом этапе при помощи регуляризатора выбирается множество ненулевых позиций итогового решения. Понятно, что параллельно ведётся и оптимизация $L + R$, но из-за наличия положительной срезки в нормировке на М-шаге этот этап очень сложно анализировать. Его стоит воспринимать как подготовка начального приближения. На втором этапе оптимизация выходит на первый план. В силу того, что множество нулевых позиций не изменяется, положительную срезку в формулах можно убрать. Это облегчает анализ, который будет проведён в соответсвующей главе.
@@ -584,7 +587,6 @@ $\exists N\ \forall k > N\colon\ \ Q^k (\phi^k, \theta^k)+ R(\Phi^k, \Theta^k) \
 
 Был проведён эксперимент, в котором сравнивались три возможных формулы М-шага. Предложенные модификации показали улучшение по сравнению со стандартными формулами. Для будущего исследования выделен вопрос управления коэффициентом перед градиентом регуляризатора в градиентной модификации М-шага.
 
-
 \begin{thebibliography}{10}
 \def\selectlanguageifdefined#1{
 \expandafter\ifx\csname date#1\endcsname\relax
@@ -608,6 +610,7 @@ Frontiers of computer science in China,
 Vol.~4.
 No.~2.
 P.~280--301.
+doi:~\url{http://dx.doi.org/10.1007/s11704-009-0062-y}.
 
 \bibitem{blei2003latent}
 \selectlanguageifdefined{english}
@@ -637,7 +640,7 @@ The author-recipient-topic model for topic and role discovery in social
 \bibitem{nallapati2008link}
 \selectlanguageifdefined{english}
 \emph{Nallapati~R., Cohen~W.~W.}
-Link-plsa-lda: A new unsupervised model for topics and influence of blogs.~//
+Link-plsa-lda: A new unsupervised model for topics and influence of blogs~//
 ICWSM.~---
 2008.
 
@@ -686,6 +689,7 @@ Machine learning,
 Vol.~37.
 No.~2.
 P.~183--233.
+doi:~\url{http://dx.doi.org/10.1007/978-94-011-5014-9_5}.
 
 \bibitem{gilks1996introducing}
 \selectlanguageifdefined{english}
@@ -715,6 +719,7 @@ Proceedings of the National Academy of Sciences,
 Vol. 101.
 No. suppl 1.
 P.~5228--5235.
+doi:~\url{http://dx.doi.org/10.1073/pnas.0307752101}.
 
 \bibitem{vorontsov2014additive}
 \selectlanguageifdefined{english}
@@ -743,6 +748,7 @@ Machine Learning,
 Vol. 101.
 No. 1-3.
 P.~303--323.
+doi:~\url{http://dx.doi.org/10.1007/s10994-014-5476-6}.
 
 \bibitem{dempster1977maximum}
 \selectlanguageifdefined{english}
@@ -759,6 +765,7 @@ On the convergence properties of the em algorithm~//
 The Annals of statistics,
 1983.
 P.~95--103.
+doi:~\url{http://dx.doi.org/10.1214/aos/1176346060}.
 
 \bibitem{topsoe2000some}
 \selectlanguageifdefined{english}
@@ -770,6 +777,7 @@ Information Theory, IEEE Transactions on,
 Vol.~46.
 No.~4.
 P.~1602--1609.
+doi:~\url{http://dx.doi.org/10.1109/18.850703}.
 
 \end{thebibliography}
 
@@ -798,6 +806,7 @@ Daud, A., J.~Li, L.~Zhou,  and F.~Muhammad.
 Knowledge discovery through directed probabilistic topic models: a survey.
 \emph{Frontiers of computer science in China}
 4(2):280--301.
+doi:~\url{http://dx.doi.org/10.1007/s11704-009-0062-y}.
 
 \bibitem{blei2003latent}
 \selectlanguageifdefined{english}
@@ -871,6 +880,7 @@ Jordan, M.~I., Z.~Ghahramani, T.~S. Jaakkola,  and L.~K. Saul.
 An introduction to variational methods for graphical models.
 \emph{Machine learning}
 37(2):183--233.
+doi:~\url{http://dx.doi.org/10.1007/978-94-011-5014-9_5}.
 
 \bibitem{gilks1996introducing}
 \selectlanguageifdefined{english}
@@ -895,6 +905,7 @@ Griffiths, T.~L.,  and M.~Steyvers.
 Finding scientific topics.
 \emph{Proceedings of the National Academy of Sciences}
 101(suppl 1):5228--5235.
+doi:~\url{http://dx.doi.org/10.1073/pnas.0307752101}.
 
 \bibitem{vorontsov2014additive}
 \selectlanguageifdefined{english}
@@ -921,6 +932,7 @@ Vorontsov, K.,  and A.~Potapenko.
 Additive regularization of topic models.
 \emph{Machine Learning}
 101(1-3):303--323.
+doi:~\url{http://dx.doi.org/10.1007/s10994-014-5476-6}.
 
 \bibitem{dempster1977maximum}
 \selectlanguageifdefined{english}
@@ -937,6 +949,7 @@ Wu, C.~J.
 On the convergence properties of the em algorithm.
 \emph{The Annals of statistics}
 95--103.
+doi:~\url{http://dx.doi.org/10.1214/aos/1176346060}.
 
 \bibitem{topsoe2000some}
 \selectlanguageifdefined{english}
@@ -946,6 +959,7 @@ Some inequalities for information divergence and related measures of
   discrimination.
 \emph{Information Theory, IEEE Transactions on}
 46(4):1602--1609.
+doi:~\url{http://dx.doi.org/10.1109/18.850703}.
 
 \end{thebibliography}
 
