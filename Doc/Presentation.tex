@@ -72,9 +72,9 @@
 		\[
 		 	p(w|d) = \sum_t p(w|t) p(t|d) \equiv \sum_t \phi_{wt} \theta_{td}.
 		\]
-		\textbf{Критерий поиска:}  максимизация логарифма правдоподобия
+		\textbf{Критерий поиска:}  максимизация логарифма правдоподобия:
 		\[
-			\sum_{d, w} n_{dw} \log \sum_{t} \phi_{wt} \theta_{td} \to \max_{\Phi, \Theta}
+			\sum_{d, w} n_{dw} \log \sum_{t} \phi_{wt} \theta_{td} \to \max_{\Phi, \Theta}.
 		\]
 	\end{frame}
 
@@ -106,7 +106,7 @@
  		\qquad $n_{td} = \sum\limits_{w} n_{dw} p_{tdw}$,\ \ \  \ $r_{td} =  \theta_{td}\dfrac{\partial R}{\partial\theta_{td}}$,\ \ \ \ \ $\theta_{td} = \norm_t  \big(n_{td} + r_{td}\big)$,
 \medskip
 
-	где $norm_y(x) = \frac{(x)_{+}}{\sum\limits_y (x)_{+}}$, и $(x)_{+} = \max(x, 0)$\footfullcite{artmdef3}.	
+	где $norm_y(x) = \frac{(x)_{+}}{\sum\limits_y (x)_{+}}$, и $(x)_{+} = \max(x, 0)$\footfullcite{artmdef3}. $r_{wt}$ и $r_{td}$ называются регуляризационными поправками. 
 	\end{frame}
 	
 	\subsection{Цели работы}	
@@ -153,8 +153,8 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 \frametitle{Несколько следствий}
 \begin{enumerate}
 \item  Если в условии №5 и №6 $\delta > 0$, то $\phi^k_{wt} - \phi_{wt}^{k-1} \to 0$ и $\theta^k_{td} - \theta^{k-1}_{td} \to 0$.
-\item Все предельные точки $\phi^k_{wt}$ и $\theta^k_{td}$ -- стационарные точки $L + R$ при каком-то ограничении на множество нулевых позиций $\Phi$ и $\Theta$.
-\item Если множество стационарных точек $L + R$ дискретно, то $\phi_{wt}^k$ и $\theta_{td}^k$ сходятся к стационарной точке $L+R$.
+\item Все предельные точки $\phi^k_{wt}$ и $\theta^k_{td}$ -- стационарные точки $L + R$ при некотором ограничении на множество нулевых позиций $\Phi$ и $\Theta$.
+\item Если множество стационарных точек $L + R$ дискретно при любом ограничении на множество нулевых позиций $\Phi$ и $\Theta$, то $\phi_{wt}^k$ и $\theta_{td}^k$ сходятся к стационарной точке $L+R$ при некотором ограничении  на множество нулевых позиций $\Phi$ и $\Theta$.
 \item Ряд $\sum\limits_{k=1}^{\infty} (p_{tdw}^k - p_{tdw}^{k-1})^2$ сходится.
 \end{enumerate}
 \end{frame}
@@ -163,7 +163,7 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 	
 \begin{frame}
 \frametitle{Несмещённая модификация}
-Для доказательства условия №7 (увеличение $Q^k+R$ на каждой итерации) предлагается заменить все вхождения $\phi_{wt}$ и $\theta_{td}$ на их несмещённые оценки $\frac{n_{wt}}{n_t}$ и $\frac{n_{td}}{n_d}$
+Для доказательства условия №7 (увеличение $Q^k+R$ на каждой итерации) предлагается заменить все вхождения $\phi_{wt}$ и $\theta_{td}$ на их несмещённые оценки $\frac{n_{wt}}{n_t}$ и $\frac{n_{td}}{n_d}$:
 \[
 \left\{
 	\begin{aligned}
@@ -194,10 +194,10 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 \frametitle{Обоснование формул}
 Градиент $R$ по $n_{wt}$ и $n_{td}$ равен:
 \[
-\frac{\partial{R}}{\partial{n_{wt}}} = \frac{1}{n_t} \bigg(\frac{\partial{R}}{\partial{\phi_{wt}}} - \sum\limits_u \phi_{ut} \frac{\partial{R}}{\partial{\phi_{ut}}}\bigg)
+\frac{\partial{R}}{\partial{n_{wt}}} = \frac{1}{n_t} \bigg(\frac{\partial{R}}{\partial{\phi_{wt}}} - \sum\limits_u \phi_{ut} \frac{\partial{R}}{\partial{\phi_{ut}}}\bigg),
 \]
 \[
-\frac{\partial{R}}{\partial{n_{td}}} = \frac{1}{n_d} \bigg( \frac{\partial{R}}{\partial{\theta_{td}}} - \sum\limits_s \theta_{sd} \frac{\partial{R}}{\partial{\theta_{sd}}} \bigg)
+\frac{\partial{R}}{\partial{n_{td}}} = \frac{1}{n_d} \bigg( \frac{\partial{R}}{\partial{\theta_{td}}} - \sum\limits_s \theta_{sd} \frac{\partial{R}}{\partial{\theta_{sd}}} \bigg).
 \]
 Для стандартной формулы преобразования можно показать, что угол с данным градиентом всегда острый, что гарантирует локальное увеличение $R$. Однако, наибольшее локальное увеличение даёт именно изменение вдоль градиента.
 \end{frame}
@@ -208,14 +208,14 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 
 Для упрощения будет рассмотрен случай $R(\Phi, \Theta) = R(\Phi)$.
 \[
-\frac{\partial{R}}{\partial{n_{wt}}}  = \frac{1}{n_t} \sum_{u} \bigg(\frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}} \bigg)  \phi_{ut}
+\frac{\partial{R}}{\partial{n_{wt}}}  = \frac{1}{n_t} \sum_{u} \bigg(\frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}} \bigg)  \phi_{ut}.
 \]
 С другой стороны изменение $n_{wt}$ на итерации равно $ \Delta n_{wt} =  \phi_{wt} \frac{\partial{R}}{\partial{\phi_{wt}}}$.
 \[
 (\overline{\Delta n_{wt}}, grad\ R(n_{wt}, n_{td})) = \sum\limits_{w, t, u}  \frac{1}{n_{t}}  \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)  \frac{\partial{R}}{\partial{\phi_{wt}}} \phi_{wt} \phi_{ut}  = 
 \]
 \[
-= \frac12  \sum\limits_{t, w, u}  \frac{1}{n_{t}} \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)^2 \phi_{wt} \phi_{ut}  \geq 0
+= \frac12  \sum\limits_{t, w, u}  \frac{1}{n_{t}} \bigg(  \frac{\partial{R}}{\partial{\phi_{wt}}}  -  \frac{\partial{R}}{\partial{\phi_{ut}}}  \bigg)^2 \phi_{wt} \phi_{ut}  \geq 0.
 \]
 \end{frame}
 
@@ -223,7 +223,7 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 \begin{frame}
 \frametitle{Отличия модификаций}
 
-Пусть $R = -\tau \sum_{w, t} \phi_{wt}$. Он не должен влиять на оптимизацию, поскольку просто равен константе при ограничениях задачи. Тем не менее, исходные формулы дадут следующий М-шаг:
+Пусть $R = -\tau \sum_{w, t} \phi_{wt}$. Он не должен влиять на оптимизацию, поскольку равен константе при ограничениях задачи. Тем не менее, исходные формулы дадут следующий М-шаг:
 \[
 \left\{
 	\begin{aligned}
@@ -244,7 +244,7 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 \subsection{Описание эксперимента}
 	
 \begin{frame}
-\frametitle{Описание эксперимента}
+\frametitle{Эксперимент}
 		
 \begin{enumerate}
 \item В качестве регуляризатора был взят регуляризатор декоррелирования ($R = -\tau\sum\limits_w \sum\limits_{t \neq s} \phi_{wt} \phi_{ws}$).
