@@ -38,7 +38,7 @@
 \setcounter{figure}{0}
 
 
-\title{Сходимость численных методов вероятностного тематического моделирования.}
+\title{Сходимость численных методов вероятностного тематического моделирования}
 \date{22 июня 2016}
 \author{Ирхин Илья Александрович}
 
@@ -220,26 +220,6 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 \end{frame}
 
 
-\begin{frame}
-\frametitle{Отличия модификаций}
-
-Пусть $R = -\tau \sum_{w, t} \phi_{wt}$. Он не должен влиять на оптимизацию, поскольку равен константе при ограничениях задачи. Тем не менее, исходные формулы дадут следующий М-шаг:
-\[
-\left\{
-	\begin{aligned}
-		\phi_{wt} = \norm_w \big( n_{wt} - \tau \phi_{wt}\big),\\
-		\theta_{td} = \norm_t \big( n_{td} - \tau \theta_{td}\big).
-	\end{aligned}
-\right.
-\]
-Что отличается от итерационного процесса для  PLSA. По формуле градиентной модификации получится, что 
-\[
-\frac{\partial{R}}{\partial{\phi_{wt}}} - \sum\limits_u \phi_{ut} \frac{\partial{R}}{\partial{\phi_{ut}}} = \tau - \tau =0
-\]
-То есть в точности PLSA.
-\end{frame}
-
-
 \section{Экпериментальные результаты}
 \subsection{Описание эксперимента}
 	
@@ -287,26 +267,11 @@ L(\phi^k, \theta^k) + R(\phi^k, \theta^k) \text{ монотонно сходит
 \begin{frame}
 \begin{figure}[h]
 	\centering
-	\caption{Изменение $R$ на M-шаге. $|T| = 10$.}    
-	\includegraphics[width=1.0\linewidth]{presentation_pictures/topics_10_RMstepDiff}
-\end{figure}
-\end{frame}
-	
-\begin{frame}
-\begin{figure}[h]
-	\centering
-	\caption{Удельное изменение $R$ на M-шаге. $|T| = 10$.}    
-	\includegraphics[width=1.0\linewidth]{presentation_pictures/topics_10_RMstepDiffPerL2}
-\end{figure}
-\end{frame}
-	
-\begin{frame}
-\begin{figure}[h]
-	\centering
 	\caption{Логарифм минимального ненулевого значения матрицы $\Phi$. $|T| = 10$.}    
 	\includegraphics[width=1.0\linewidth]{presentation_pictures/topics_10_minPhi_values}
 \end{figure}
 \end{frame}
+	
 	
 \begin{frame}{Итоги экспериментов}
 \begin{enumerate}
