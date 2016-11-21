@@ -79,10 +79,10 @@
 \]
  Пусть $q(Z)$ --- произвольное распределение на скрытых переменных:
 \[
-\log p(X|\Omega) = \int q(Z) \log p(X|\Omega) dZ = \int q(Z) \frac{\log p(X, Z|\Omega)}{\log p(Z|X,\Omega)} dZ = 
+\log p(X|\Omega) = \int q(Z) \log p(X|\Omega) dZ = \int q(Z) \log\frac{ p(X, Z|\Omega)}{p(Z|X,\Omega)} dZ = 
 \]
 \[
-=  \int q(Z) \frac{\log p(X, Z|\Omega)}{q(Z)} \frac{q(Z)}{\log p(Z|X,\Omega)} dZ =  
+=  \int q(Z) \log \left( \frac{p(X, Z|\Omega)}{q(Z)} \frac{q(Z)}{p(Z|X,\Omega)}\right)  dZ =  
 \]
 \[
 = \underbrace{  \int q(Z) \log p(X, Z|\Omega) dZ  - \int q(Z) \log q(Z) dZ }_{F(q, \Omega)} +  \underbrace{  \int q(Z) \frac{q(Z)}{p(Z|X,\Omega)} dZ }_{KL(q(Z)\|p(Z|X,\Omega))}
@@ -114,7 +114,7 @@ F(q, \Omega) + KL(q(Z)\|p(Z|X,\Omega)) \to \max\limits_{\Omega}
 \log p(X|\Omega) + \log p(\Omega) = F(q, \Omega) + KL(q(Z)\|p(Z|X,\Omega)) + \log p(\Omega) \to \max\limits_{\Omega}
 \]
 
-\textbf{E-step}: $q(Z) = p(Z|X, \Omega)$
+\textbf{E-шаг}: $q(Z) = p(Z|X, \Omega)$
 
 \medskip
 
@@ -158,7 +158,7 @@ p(X, Z|\Phi, \Theta) =\prod\limits_{i=1}^{n} p(d_{i}, w_{i}, t_{i}|\Phi, \Theta)
 		\frametitle{Вероятностный вывод PLSA. Е-шаг}   
 На E-шаге необходимо оценить распределение на скрытых переменных при условии параметров и  наблюдаемых величин: $p(Z|X,\Phi,\Theta)$. Так как словопозиции независимы, то сразу можно перейти к отдельным вероятностям:
 \[
-p(Z|X,\Phi, \Theta) = \prod\limits_{i=1}^{n} \frac{\phi_{w_{i}t_{i}}\theta_{t_{i}d_{i}}} {\sum_{t=1}^T \phi_{w_{i}t} \theta_{td_i}}
+p(Z|X,\Phi, \Theta) = \prod\limits_{i=1}^{n} p(t_i| w_i, d_i, \Phi, \Theta)
 \]
 
 Чтобы найти эти вероятности, воспользуемся формулой Байеса:
