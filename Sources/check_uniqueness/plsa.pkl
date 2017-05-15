@@ -1,0 +1,12 @@
+(dp0
+S'init_theta'
+p1
+NsS'phis'
+p2
+(lp3
+sS'perplexities'
+p4
+(lp5
+sS'init_phi'
+p6
+Ns.
