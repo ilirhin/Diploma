@@ -87,6 +87,8 @@ def perform_phi_experiment(
         avg_top5_pmis.append(avg_top5_pmi)
         avg_top10_pmis.append(avg_top10_pmi)
         avg_top20_pmis.append(avg_top20_pmi)
+        kernel_avg_sizes.append(kernel_avg_size)
+        kernel_avg_jacards.append(kernel_avg_jacard)
 
     return {
         'train_perplexities': train_perplexities,
@@ -96,7 +98,9 @@ def perform_phi_experiment(
         'topic_correlations': topic_correlations,
         'avg_top5_pmis': avg_top5_pmis,
         'avg_top10_pmis': avg_top10_pmis,
-        'avg_top20_pmis': avg_top20_pmis
+        'avg_top20_pmis': avg_top20_pmis,
+        'kernel_avg_sizes': kernel_avg_sizes,
+        'kernel_avg_jacards': kernel_avg_jacards
     }
   
 
