@@ -43,14 +43,14 @@ def perform_phi_experiment(
 
         np.random.seed(seed)
 
-        phi_matrix = np.random.uniform(size=(T, W)).astype(np.float64)
+        phi_matrix = np.random.uniform(size=(T, W)).astype(np.float64) + 0.1
         phi_matrix /= np.sum(phi_matrix, axis=1)[:, np.newaxis]
 
         theta_matrix = np.ones(shape=(D, T)).astype(np.float64)
         theta_matrix /= np.sum(theta_matrix, axis=1)[:, np.newaxis]
 
         regularization_list = np.zeros(200, dtype=object)
-        regularization_list[:] = create_reg_lda(0., 0.)
+        regularization_list[:] = create_reg_lda(phi_alpha, theta_alpha)
 
         _train_perplexity = artm_calc_perplexity_factory(train_n_dw_matrix) 
         _test_perplexity = artm_calc_perplexity_factory(test_n_dw_matrix)

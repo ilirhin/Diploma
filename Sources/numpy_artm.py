@@ -7,6 +7,7 @@ import scipy.sparse
 from sklearn.datasets import fetch_20newsgroups
 import gensim
 from collections import Counter
+from collections import defaultdict
 import heapq
 import nltk
 import random
@@ -193,6 +194,89 @@ def prepare_dataset(dataset, calc_cooccurences=False, train_test_split=None, tok
                 num_2_token,
                 doc_targets
             )
+        
+        
+def prepare_nips_dataset(dataset_path, calc_cooccurences=False, train_test_split=None):
+    row, col, data = [], [], []
+    row_test, col_test, data_test = [], [], []
+    not_empty_docs_number = 0
+    doc_targets = []
+    doc_cooccurences = Counter()
+    doc_occurences = Counter()
+    random_gen = random.Random(42)
+    token_2_num = {}
+    documents = defaultdict(list)
+
+    with open(dataset_path, 'r') as f:
+        for i, line in enumerate(f.xreadlines()):
+            if i % 1000 == 0:
+                print 'Read file lines:', i
+            if i > 0:
+                tokens = line.strip().split(',')
+                token_2_num[tokens[0][1:-1]] = i - 1
+                for doc_num, val in enumerate(tokens[1:]):
+                    value = int(val)
+                    if value > 0:
+                        documents[doc_num].append((i - 1, value))
+    num_2_token = {
+        v: k
+        for k, v in token_2_num.iteritems()
+    }
+
+    for doc_num, words in documents.iteritems():
+        if doc_num % 100 == 0:
+            print 'Processed documents:', doc_num
+        
+        cnt = Counter()
+        cnt_test = Counter()
+        
+        for word_num, number in words:
+            for _ in xrange(number):
+                if train_test_split is None or random_gen.random() < train_test_split:
+                    cnt[word_num] += 1
+                else:
+                    cnt_test[word_num] += 1
+
+        if len(cnt) > 0 and (train_test_split is None or len(cnt_test) > 0):
+            for w, c in cnt.iteritems():
+                row.append(not_empty_docs_number)
+                col.append(w)
+                data.append(c)
+                
+            for w, c in cnt_test.iteritems():
+                row_test.append(not_empty_docs_number)
+                col_test.append(w)
+                data_test.append(c)
+                
+            not_empty_docs_number += 1
+            
+            if calc_cooccurences:
+                keys = [x for x, _ in words]
+                doc_cooccurences.update({(w1, w2) for w1 in keys for w2 in keys if w1 != w2})
+                doc_occurences.update(keys)
+
+    if train_test_split is None:
+        if calc_cooccurences:
+            return scipy.sparse.csr_matrix((data, (row, col))), token_2_num, num_2_token, doc_occurences, doc_cooccurences
+        else:
+            return scipy.sparse.csr_matrix((data, (row, col))), token_2_num, num_2_token
+    else:
+        if calc_cooccurences:
+            return (
+                scipy.sparse.csr_matrix((data, (row, col))),
+                scipy.sparse.csr_matrix((data_test, (row_test, col_test))),
+                token_2_num,
+                num_2_token,
+                doc_occurences,
+                doc_cooccurences
+            )
+        else:
+            return (
+                scipy.sparse.csr_matrix((data, (row, col))),
+                scipy.sparse.csr_matrix((data_test, (row_test, col_test))),
+                token_2_num,
+                num_2_token
+            )
 
 
 def create_calculate_likelihood_like_function(n_dw_matrix, loss_function=LogFunction()):
@@ -357,7 +441,7 @@ def artm_thetaless_em_optimization(
         theta_matrix /= np.sum(theta_matrix, axis=1)[:, np.newaxis]
         phi_matrix_tr = np.transpose(phi_matrix)
         
-        s_data = 1. / inner1d(theta_matrix[docptr, :], phi_matrix_tr[wordptr, :])
+        s_data = 1. / (inner1d(theta_matrix[docptr, :], phi_matrix_tr[wordptr, :]) + 1e-20)
         A = scipy.sparse.csr_matrix(
             (
                 n_dw_matrix.data  * s_data , 
@@ -528,7 +612,7 @@ def artm_calc_pmi_top_factory(doc_occurences, doc_cooccurences, documents_number
             for w1 in top:
                 for w2 in top:
                     if w1 != w2:
-                        pmi += np.log(documents_number * (doc_cooccurences[(w1, w2)] + 0.1) * 1. / doc_occurences[w1] / doc_occurences[w2])
+                        pmi += np.log(documents_number * (doc_cooccurences.get((w1, w2), 0.) + 0.1) * 1. / doc_occurences.get(w1, 0) / doc_occurences.get(w2))
         return pmi / (T * top_size * (top_size - 1))
     return fun
 
