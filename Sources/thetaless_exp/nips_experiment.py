@@ -11,6 +11,7 @@ def perform_experiment((
     optimization_method,
     T, iters_count, samples,
     phi_alpha, theta_alpha, 
+    params,
     train_n_dw_matrix, test_n_dw_matrix,
     doc_occurences, doc_cooccurences,
     output_path
@@ -25,6 +26,7 @@ def perform_experiment((
     avg_top5_pmis = []
     avg_top10_pmis = []
     avg_top20_pmis = []
+    avg_top30_pmis = []
     kernel_avg_sizes = []
     kernel_avg_jacards = []
 
@@ -38,6 +40,7 @@ def perform_experiment((
         avg_top5_pmi = []
         avg_top10_pmi = []
         avg_top20_pmi = []
+        avg_top30_pmi = []
         kernel_avg_size = []
         kernel_avg_jacard = []
 
@@ -57,6 +60,7 @@ def perform_experiment((
         _top5_pmi = artm_calc_pmi_top_factory(doc_occurences, doc_cooccurences, train_n_dw_matrix.shape[0], 5)
         _top10_pmi = artm_calc_pmi_top_factory(doc_occurences, doc_cooccurences, train_n_dw_matrix.shape[0], 10)
         _top20_pmi = artm_calc_pmi_top_factory(doc_occurences, doc_cooccurences, train_n_dw_matrix.shape[0], 20)
+        _top30_pmi = artm_calc_pmi_top_factory(doc_occurences, doc_cooccurences, train_n_dw_matrix.shape[0], 30)
 
         def callback(it, phi, theta):
             train_perplexity.append(_train_perplexity(phi, theta))
@@ -67,6 +71,7 @@ def perform_experiment((
             avg_top5_pmi.append(_top5_pmi(phi))
             avg_top10_pmi.append(_top10_pmi(phi))
             avg_top20_pmi.append(_top20_pmi(phi))
+            avg_top30_pmi.append(_top30_pmi(phi))
             kernel_avg_size.append(np.mean(artm_get_kernels_sizes(phi)))
             kernel_avg_jacard.append(artm_get_avg_pairwise_kernels_jacards(phi))
 
@@ -77,7 +82,8 @@ def perform_experiment((
             theta_matrix=theta_matrix,
             regularization_list=regularization_list,
             iters_count=iters_count,
-            iteration_callback=callback
+            iteration_callback=callback,
+            params=params
         )
 
         train_perplexities.append(train_perplexity)
@@ -88,6 +94,7 @@ def perform_experiment((
         avg_top5_pmis.append(avg_top5_pmi)
         avg_top10_pmis.append(avg_top10_pmi)
         avg_top20_pmis.append(avg_top20_pmi)
+        avg_top30_pmis.append(avg_top30_pmi)
         kernel_avg_sizes.append(kernel_avg_size)
         kernel_avg_jacards.append(kernel_avg_jacard)
 
@@ -101,6 +108,7 @@ def perform_experiment((
             'avg_top5_pmis': avg_top5_pmis,
             'avg_top10_pmis': avg_top10_pmis,
             'avg_top20_pmis': avg_top20_pmis,
+            'avg_top30_pmis': avg_top30_pmis,
             'kernel_avg_sizes': kernel_avg_sizes,
             'kernel_avg_jacards': kernel_avg_jacards
         }, f)
@@ -125,72 +133,226 @@ if __name__ == '__main__':
                     w, value = map(int, line.split(','))
                     doc_occurences[w] = value
 
-        pool = Pool(processes=10)
+        pool = Pool(processes=6)
 
         args_list = [
             (
                 em_optimization, 
-                30, 100, 20,
+                20, 100, 20,
                 0., 0.,
+                {},
                 train_n_dw_matrix, test_n_dw_matrix,
                 doc_occurences, doc_cooccurences,
-                'NIPS_30t_base_0_0.pkl'
+                'NIPS_20t_base_0_0.pkl'
             ),
             (
                 artm_thetaless_em_optimization, 
-                30, 100, 20,
+                20, 100, 20,
                 0., 0.,
+                {'use_B_cheat': False},
                 train_n_dw_matrix, test_n_dw_matrix,
                 doc_occurences, doc_cooccurences,
-                'NIPS_30t_artm_0_0.pkl'
+                'NIPS_20t_artm_0_0.pkl'
+            ),
+            (
+                artm_thetaless_em_optimization, 
+                20, 100, 20,
+                0., 0.,
+                {'use_B_cheat': True},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_20t_artm_0_0_cheat.pkl'
             ),
             (
                 em_optimization, 
-                30, 100, 20,
+                20, 100, 20,
                 -0.1, 0.,
+                {},
                 train_n_dw_matrix, test_n_dw_matrix,
                 doc_occurences, doc_cooccurences,
-                'NIPS_30t_base_-0.1_0.pkl'
+                'NIPS_20t_base_-0.1_0.pkl'
             ),
             (
                 artm_thetaless_em_optimization, 
-                30, 100, 20,
+                20, 100, 20,
                 -0.1, 0.,
+                {'use_B_cheat': False},
                 train_n_dw_matrix, test_n_dw_matrix,
                 doc_occurences, doc_cooccurences,
-                'NIPS_30t_artm_-0.1_0.pkl'
-            ),
-            (
-                em_optimization, 
-                30, 100, 20,
-                0.1, 0.,
-                train_n_dw_matrix, test_n_dw_matrix,
-                doc_occurences, doc_cooccurences,
-                'NIPS_30t_base_+0.1_0.pkl'
+                'NIPS_20t_artm_-0.1_0.pkl'
             ),
             (
                 artm_thetaless_em_optimization, 
-                30, 100, 20,
-                0.1, 0.,
+                20, 100, 20,
+                -0.1, 0.,
+                {'use_B_cheat': True},
                 train_n_dw_matrix, test_n_dw_matrix,
                 doc_occurences, doc_cooccurences,
-                'NIPS_30t_artm_+0.1_0.pkl'
+                'NIPS_20t_artm_-0.1_0_cheat.pkl'
             ),
             (
                 em_optimization, 
-                30, 100, 20,
-                0., -0.1,
+                20, 100, 20,
+                0.1, 0.,
+                {},
                 train_n_dw_matrix, test_n_dw_matrix,
                 doc_occurences, doc_cooccurences,
-                'NIPS_30t_base_0_-0.1.pkl'
+                'NIPS_20t_base_+0.1_0.pkl'
             ),
             (
                 artm_thetaless_em_optimization, 
-                30, 100, 20,
-                0., -0.1,
+                20, 100, 20,
+                0.1, 0.,
+                {'use_B_cheat': False},
                 train_n_dw_matrix, test_n_dw_matrix,
                 doc_occurences, doc_cooccurences,
-                'NIPS_30t_artm_0_-0.1.pkl'
+                'NIPS_20t_artm_+0.1_0.pkl'
+            ),
+            (
+                artm_thetaless_em_optimization, 
+                20, 100, 20,
+                0.1, 0.,
+                {'use_B_cheat': True},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_20t_artm_+0.1_0_cheat.pkl'
+            ),
+            (
+                em_optimization, 
+                20, 100, 20,
+                0., -0.1,
+                {},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_20t_base_0_-0.1.pkl'
+            ),
+            (
+                em_optimization, 
+                20, 100, 20,
+                0., -0.1,
+                {'use_B_cheat': False},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_20t_artm_0_-0.1.pkl'
+            ),
+            (
+                artm_thetaless_em_optimization, 
+                20, 100, 20,
+                0., -0.1,
+                {'use_B_cheat': True},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_20t_artm_0_-0.1_cheat.pkl'
+            ),
+
+
+            (
+                em_optimization, 
+                50, 100, 20,
+                0., 0.,
+                {},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_50t_base_0_0.pkl'
+            ),
+            (
+                artm_thetaless_em_optimization, 
+                50, 100, 20,
+                0., 0.,
+                {'use_B_cheat': False},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_50t_artm_0_0.pkl'
+            ),
+            (
+                artm_thetaless_em_optimization, 
+                50, 100, 20,
+                0., 0.,
+                {'use_B_cheat': True},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_50t_artm_0_0_cheat.pkl'
+            ),
+            (
+                em_optimization, 
+                50, 100, 20,
+                -0.1, 0.,
+                {},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_50t_base_-0.1_0.pkl'
+            ),
+            (
+                artm_thetaless_em_optimization, 
+                50, 100, 20,
+                -0.1, 0.,
+                {'use_B_cheat': False},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_50t_artm_-0.1_0.pkl'
+            ),
+            (
+                artm_thetaless_em_optimization, 
+                50, 100, 20,
+                -0.1, 0.,
+                {'use_B_cheat': True},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_50t_artm_-0.1_0_cheat.pkl'
+            ),
+            (
+                em_optimization, 
+                50, 100, 20,
+                0.1, 0.,
+                {},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_50t_base_+0.1_0.pkl'
+            ),
+            (
+                artm_thetaless_em_optimization, 
+                50, 100, 20,
+                0.1, 0.,
+                {'use_B_cheat': False},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_50t_artm_+0.1_0.pkl'
+            ),
+            (
+                artm_thetaless_em_optimization, 
+                50, 100, 20,
+                0.1, 0.,
+                {'use_B_cheat': True},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_50t_artm_+0.1_0_cheat.pkl'
+            ),
+            (
+                em_optimization, 
+                50, 100, 20,
+                0., -0.1,
+                {},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_50t_base_0_-0.1.pkl'
+            ),
+            (
+                artm_thetaless_em_optimization, 
+                50, 100, 20,
+                0., -0.1,
+                {'use_B_cheat': False},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_50t_artm_0_-0.1.pkl'
+            ),
+            (
+                artm_thetaless_em_optimization, 
+                50, 100, 20,
+                0., -0.1,
+                {'use_B_cheat': True},
+                train_n_dw_matrix, test_n_dw_matrix,
+                doc_occurences, doc_cooccurences,
+                'NIPS_50t_artm_0_-0.1_cheat.pkl'
             )
         ]
 

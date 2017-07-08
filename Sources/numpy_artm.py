@@ -303,8 +303,11 @@ def em_optimization(
     iters_count=100,
     loss_function=LogFunction(),
     iteration_callback=None,
-    const_phi=False
+    const_phi=False,
+    params=None
 ):
+    if params is None:
+        params = {}
     D, W = n_dw_matrix.shape
     T = phi_matrix.shape[0]
     phi_matrix = np.copy(phi_matrix)
@@ -358,8 +361,11 @@ def naive_thetaless_em_optimization(
     regularization_list,
     iters_count=100,
     iteration_callback=None,
-    theta_matrix=None
+    theta_matrix=None,
+    params=None
 ):
+    if params is None:
+        params = {}
     D, W = n_dw_matrix.shape
     T = phi_matrix.shape[0]
     phi_matrix = np.copy(phi_matrix)
@@ -406,8 +412,13 @@ def artm_thetaless_em_optimization(
     regularization_list,
     iters_count=100,
     iteration_callback=None,
-    theta_matrix=None
+    theta_matrix=None,
+    params=None
 ):
+    if params is None:
+        params = {}
+    use_B_cheat = params.get('use_B_cheat', False)
+                             
     D, W = n_dw_matrix.shape
     T = phi_matrix.shape[0]
     phi_matrix = np.copy(phi_matrix)
@@ -417,14 +428,17 @@ def artm_thetaless_em_optimization(
     for doc_num in xrange(D):
         size = indptr[doc_num + 1] - indptr[doc_num]
         docptr.extend([doc_num] * size)
-        docsizes.extend([size] * size)
+        if use_B_cheat:
+            docsizes.extend([size] * size)
+        else:
+            docsizes.extend([np.sum(n_dw_matrix.data[indptr[doc_num]:indptr[doc_num + 1]])] * size)
     docptr = np.array(docptr)
     wordptr = n_dw_matrix.indices
     docsizes = np.array(docsizes)
     
     B = scipy.sparse.csr_matrix(
         (
-            1. * n_dw_matrix.data  / docsizes, 
+            1. * n_dw_matrix.data / docsizes, 
             n_dw_matrix.indices, 
             n_dw_matrix.indptr
         ), 
@@ -481,8 +495,11 @@ def gradient_optimization(
     iters_count=100,
     loss_function=LogFunction(),
     iteration_callback=None,
-    learning_rate=1.
+    learning_rate=1.,
+    params=None
 ):
+    if params is None:
+        params = {}
     D, W = n_dw_matrix.shape
     T = phi_matrix.shape[0]
     phi_matrix = np.copy(phi_matrix)
@@ -612,7 +629,7 @@ def artm_calc_pmi_top_factory(doc_occurences, doc_cooccurences, documents_number
             for w1 in top:
                 for w2 in top:
                     if w1 != w2:
-                        pmi += np.log(documents_number * (doc_cooccurences.get((w1, w2), 0.) + 0.1) * 1. / doc_occurences.get(w1, 0) / doc_occurences.get(w2))
+                        pmi += np.log(documents_number * (doc_cooccurences.get((w1, w2), 0.) + 1e-4) * 1. / doc_occurences.get(w1, 0) / doc_occurences.get(w2, 0))
         return pmi / (T * top_size * (top_size - 1))
     return fun
 
