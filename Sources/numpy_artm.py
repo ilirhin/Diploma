@@ -170,16 +170,17 @@ def prepare_dataset(dataset, calc_cooccurences=False, train_test_split=None, tok
         for k, v in token_2_num.iteritems()
     }
     print 'Nonzero values:', len(data)
+    shape = (len(doc_targets), len(token_2_num))
     if train_test_split is None:
         if calc_cooccurences:
-            return scipy.sparse.csr_matrix((data, (row, col))), token_2_num, num_2_token, doc_targets, doc_occurences, doc_cooccurences
+            return scipy.sparse.csr_matrix((data, (row, col)), shape=shape), token_2_num, num_2_token, doc_targets, doc_occurences, doc_cooccurences
         else:
-            return scipy.sparse.csr_matrix((data, (row, col))), token_2_num, num_2_token, doc_targets
+            return scipy.sparse.csr_matrix((data, (row, col)), shape=shape), token_2_num, num_2_token, doc_targets
     else:
         if calc_cooccurences:
             return (
-                scipy.sparse.csr_matrix((data, (row, col))),
-                scipy.sparse.csr_matrix((data_test, (row_test, col_test))),
+                scipy.sparse.csr_matrix((data, (row, col)), shape=shape),
+                scipy.sparse.csr_matrix((data_test, (row_test, col_test)), shape=shape),
                 token_2_num,
                 num_2_token,
                 doc_targets,
@@ -255,6 +256,9 @@ def prepare_nips_dataset(dataset_path, calc_cooccurences=False, train_test_split
                 doc_cooccurences.update({(w1, w2) for w1 in keys for w2 in keys if w1 != w2})
                 doc_occurences.update(keys)
 
+    print 'Nonzero values:', len(data)
+    shape = (len(doc_targets), len(token_2_num))
+    
     if train_test_split is None:
         if calc_cooccurences:
             return scipy.sparse.csr_matrix((data, (row, col))), token_2_num, num_2_token, doc_occurences, doc_cooccurences
@@ -263,8 +267,8 @@ def prepare_nips_dataset(dataset_path, calc_cooccurences=False, train_test_split
     else:
         if calc_cooccurences:
             return (
-                scipy.sparse.csr_matrix((data, (row, col))),
-                scipy.sparse.csr_matrix((data_test, (row_test, col_test))),
+                scipy.sparse.csr_matrix((data, (row, col)), shape=shape),
+                scipy.sparse.csr_matrix((data_test, (row_test, col_test)), shape=shape),
                 token_2_num,
                 num_2_token,
                 doc_occurences,
@@ -272,8 +276,8 @@ def prepare_nips_dataset(dataset_path, calc_cooccurences=False, train_test_split
             )
         else:
             return (
-                scipy.sparse.csr_matrix((data, (row, col))),
-                scipy.sparse.csr_matrix((data_test, (row_test, col_test))),
+                scipy.sparse.csr_matrix((data, (row, col)), shape=shape),
+                scipy.sparse.csr_matrix((data_test, (row_test, col_test)), shape=shape),
                 token_2_num,
                 num_2_token
             )
@@ -552,7 +556,7 @@ def gradient_optimization(
     return phi_matrix, theta_matrix
 
 
-def svm_score(theta, targets):
+def svm_score(theta, targets, verbose=True):
     C_2d_range = [1e-1, 1e0, 1e1, 1e2, 1e3, 1e4]
     gamma_2d_range = [1e-3, 1e-2, 1e-1, 1, 1e1]
     best_C, best_gamma, best_val = None, None, 0.
@@ -563,23 +567,25 @@ def svm_score(theta, targets):
             val = np.mean(cross_val_score(SVC(C=C, gamma=gamma), X_train, y_train, scoring='accuracy', cv=4))
             algo = SVC(C=C, gamma=gamma).fit(X_train, y_train)
             test_score = accuracy_score(y_test, algo.predict(X_test))
-            print 'SVM(C={}, gamma={}) cv-score: {}  test-score: {}'.format(
-                C,
-                gamma,
-                round(val, 3),
-                round(test_score, 3)
-            )
+            if verbose:
+                print 'SVM(C={}, gamma={}) cv-score: {}  test-score: {}'.format(
+                    C,
+                    gamma,
+                    round(val, 3),
+                    round(test_score, 3)
+                )
             if val > best_val:
                 best_val = val
                 best_C = C
                 best_gamma = gamma
                 best_cv_algo_score_on_test = test_score
-    print '\n\n\nBest cv params: C={}, gamma={}\nCV score: {}\nTest score:{}'.format(
-        best_C,
-        best_gamma,
-        round(best_val, 3),
-        round(best_cv_algo_score_on_test, 3)
-    )
+    if verbose:
+        print '\n\n\nBest cv params: C={}, gamma={}\nCV score: {}\nTest score:{}'.format(
+            best_C,
+            best_gamma,
+            round(best_val, 3),
+            round(best_cv_algo_score_on_test, 3)
+        )
     return best_C, best_gamma, best_val, best_cv_algo_score_on_test
 
 
