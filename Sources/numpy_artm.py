@@ -350,6 +350,7 @@ def em_optimization(
         
         if not const_phi:
             phi_matrix = n_tw / np.sum(n_tw, axis=1)[:, np.newaxis]
+        n_dt += (np.sum(n_dt, axis=1) == 0)[:, np.newaxis]
         theta_matrix = n_dt / np.sum(n_dt, axis=1)[:, np.newaxis]
         
         if iteration_callback is not None:
@@ -472,15 +473,16 @@ def artm_thetaless_em_optimization(
         n_tw = A.T.dot(theta_matrix).T * phi_matrix
         
         r_tw, r_dt = regularization_list[it](n_tw, theta_matrix)
-        theta_indices = theta_matrix > 0
+        theta_indices = theta_matrix > 1e-10
         r_dt[theta_indices] /= theta_matrix[theta_indices]
+        r_dt[~theta_indices] = 0.
         
         g_dt = A.dot(phi_matrix_tr) + r_dt
         tmp = g_dt.T * B / word_norm
         r_tw += (tmp - np.einsum('ij,ji->i', phi_rev_matrix, tmp)) * phi_matrix
         
         n_tw += r_tw
-        n_tw[n_tw < 0] = 0
+        n_tw[n_tw < 1e-20] = 0
         phi_matrix = n_tw / np.sum(n_tw, axis=1)[:, np.newaxis]
         phi_matrix[np.isnan(phi_matrix)] = 0.
 
@@ -615,6 +617,29 @@ def artm_get_avg_pairwise_kernels_jacards(phi):
             if i != j:
                 res += 1. * len(kernels[i] & kernels[j]) / len(kernels[i] | kernels[j])
     return res / T / (T - 1)
+
+
+def artm_calc_phi_uniqueness_measures(phi):
+    T, W = phi.shape
+    res = []
+    nres = []
+    for t in xrange(T):
+        positions = phi[t, :] == 0.
+        topics = [x for x in xrange(T) if x != t]
+        if np.sum(positions) == 0:
+            res.append(0.)
+            nres.append(0.)
+        else:
+            rank = np.linalg.matrix_rank(phi[np.ix_(topics, positions)])
+            if rank == T - 1:
+                max_val = np.min(np.linalg.svd(phi[topics, :])[1])
+                curr_val = np.min(np.linalg.svd(phi[np.ix_(topics, positions)])[1])
+                res.append(curr_val)
+                nres.append(curr_val / max_val)
+            else:
+                res.append(0.)
+                nres.append(0.)
+    return res, nres
 
 
 def artm_calc_perplexity_factory(n_dw_matrix):
