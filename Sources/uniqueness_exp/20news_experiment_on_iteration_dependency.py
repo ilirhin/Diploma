@@ -61,7 +61,6 @@ def perform_experiment((
 
         def callback(it, phi, theta):
             if it % 5 == 0:
-                print 'iteration', it
                 train_perplexity.append(_train_perplexity(phi, theta))
                 test_perplexity.append(_test_perplexity(phi, theta))
                 sparsity.append(1. * np.sum(phi < 1e-20) / np.sum(phi >= 0))
@@ -108,7 +107,7 @@ if __name__ == '__main__':
                 t, 100, 10,
                 -0.1, 0.,
                 {},
-                'iter_exp_20news_{}t_base_-0.1_0.pkl'.format(t)
+                'iter_exp/iter_exp_20news_{}t_base_-0.1_0.pkl'.format(t)
             )
         )
 

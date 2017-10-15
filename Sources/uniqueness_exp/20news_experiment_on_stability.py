@@ -1,5 +1,5 @@
-# coding: utf-8
 #coding: utf-8
+
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
@@ -59,7 +59,7 @@ print 'Original PLSA'
 
 phis = []
 perplexities = []
-for seed in xrange(3):
+for seed in xrange(300):
     print seed
     phi, theta = perform_extended_lda(10, 0., 0., seed, n_dw_matrix)
     phis.append(phi.flatten())
@@ -82,7 +82,7 @@ new_init_phi, new_init_theta = perform_extended_lda(10, 0., 0., 42, n_dw_matrix,
 
 phis = []
 perplexities = []
-for seed in xrange(3):
+for seed in xrange(300):
     print seed
     phi, theta = perform_extended_lda(10, 0., 0., seed, n_dw_matrix, phi_zero_init=new_init_phi, theta_zero_init=new_init_theta)
     phis.append(phi.flatten())
@@ -134,7 +134,7 @@ for seed in xrange(100):
     print seed
     phi, theta = perform_extended_lda(10, 0., 0., seed, new_n_dw_matrix, phi_zero_init=origin_phi, theta_zero_init=origin_theta)
     phis.append(phi.flatten())
-    perplexities.append(external_calculate_perplexity(new_freq_matrix, phi, theta))
+    perplexities.append(_train_perplexity(phi, theta))
 
 with open('check_uniqueness/full_initialized_syntetic_plsa.pkl', 'w') as f:
     pickle.dump({

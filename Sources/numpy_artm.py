@@ -21,6 +21,22 @@ from sklearn.manifold import TSNE
 import time
 
 
+MAX_INNER1D_ELEMENTS = 500000000
+
+
+def memory_efficient_inner1d(fst_arr, fst_indices, snd_arr, snd_indices):
+    _, T = fst_arr.shape
+    size = len(fst_indices)
+    result = np.zeros(size)
+    batch_size = MAX_INNER1D_ELEMENTS / T
+    start = 0
+    while start < size:
+        finish = min(start + batch_size, size)
+        result[start:finish] = inner1d(fst_arr[fst_indices[start:finish], :], snd_arr[snd_indices[start:finish], :])
+        start = finish
+    return result
+
+
 class LogFunction(object):
     def calc(self, x):
         return np.log(x + 1e-20)
@@ -293,7 +309,7 @@ def create_calculate_likelihood_like_function(n_dw_matrix, loss_function=LogFunc
     wordptr = n_dw_matrix.indices
     
     def fun(phi_matrix, theta_matrix):
-        s_data = loss_function.calc(inner1d(theta_matrix[docptr, :], np.transpose(phi_matrix)[wordptr, :]))
+        s_data = loss_function.calc(memory_efficient_inner1d(theta_matrix, docptr, np.transpose(phi_matrix), wordptr))
         return np.sum(n_dw_matrix.data * s_data)
 
     return fun
@@ -312,6 +328,8 @@ def em_optimization(
 ):
     if params is None:
         params = {}
+    return_counters = params.get('return_counters', False)
+
     D, W = n_dw_matrix.shape
     T = phi_matrix.shape[0]
     phi_matrix = np.copy(phi_matrix)
@@ -327,7 +345,7 @@ def em_optimization(
     for it in xrange(iters_count):
         phi_matrix_tr = np.transpose(phi_matrix)
         # следующая строчка это 60% времени работы алгоритма
-        s_data = loss_function.calc_der(inner1d(theta_matrix[docptr, :], phi_matrix_tr[wordptr, :]))
+        s_data = loss_function.calc_der(memory_efficient_inner1d(theta_matrix, docptr, phi_matrix_tr, wordptr))
         # следующая часть это 25% времени работы алгоритма
         A = scipy.sparse.csr_matrix(
             (
@@ -344,20 +362,26 @@ def em_optimization(
         
         r_tw, r_dt = regularization_list[it](n_tw, n_dt)
         n_tw += r_tw
-        n_dt += n_dt
+        n_dt += r_dt
         n_tw[n_tw < 0] = 0
         n_dt[n_dt < 0] = 0
         
         if not const_phi:
+            n_tw[np.sum(n_tw, axis=1) < 1e-20, :] += 1
             phi_matrix = n_tw / np.sum(n_tw, axis=1)[:, np.newaxis]
-        n_dt += (np.sum(n_dt, axis=1) == 0)[:, np.newaxis]
+
+        n_dt[np.sum(n_dt, axis=1) < 1e-20, :] += 1
         theta_matrix = n_dt / np.sum(n_dt, axis=1)[:, np.newaxis]
         
         if iteration_callback is not None:
             iteration_callback(it, phi_matrix, theta_matrix)
     
     print 'Iters time', time.time() - start_time
-    return phi_matrix, theta_matrix
+    
+    if return_counters:
+        return phi_matrix, theta_matrix, n_tw, n_dt
+    else:
+        return phi_matrix, theta_matrix
 
 
 def naive_thetaless_em_optimization(
@@ -371,6 +395,8 @@ def naive_thetaless_em_optimization(
 ):
     if params is None:
         params = {}
+    return_counters = params.get('return_counters', False)
+
     D, W = n_dw_matrix.shape
     T = phi_matrix.shape[0]
     phi_matrix = np.copy(phi_matrix)
@@ -385,10 +411,12 @@ def naive_thetaless_em_optimization(
     for it in xrange(iters_count):
         phi_rev_matrix = np.transpose(phi_matrix / np.sum(phi_matrix, axis=0))
         theta_matrix = n_dw_matrix.dot(phi_rev_matrix)
+        
+        theta_matrix[np.sum(theta_matrix, axis=1) < 1e-20, :] += 1
         theta_matrix /= np.sum(theta_matrix, axis=1)[:, np.newaxis]
         phi_matrix_tr = np.transpose(phi_matrix)
         
-        s_data = 1. / inner1d(theta_matrix[docptr, :], phi_matrix_tr[wordptr, :])
+        s_data = 1. / memory_efficient_inner1d(theta_matrix, docptr, phi_matrix_tr, wordptr)
         A = scipy.sparse.csr_matrix(
             (
                 n_dw_matrix.data  * s_data , 
@@ -402,13 +430,18 @@ def naive_thetaless_em_optimization(
         r_tw, _ = regularization_list[it](n_tw, theta_matrix)
         n_tw += r_tw
         n_tw[n_tw < 0] = 0
+        n_tw[np.sum(n_tw, axis=1) < 1e-20, :] += 1
         phi_matrix = n_tw / np.sum(n_tw, axis=1)[:, np.newaxis]
 
         if iteration_callback is not None:
             iteration_callback(it, phi_matrix, theta_matrix)
     
     print 'Iters time', time.time() - start_time    
-    return phi_matrix, theta_matrix
+    
+    if return_counters:
+        return phi_matrix, theta_matrix, n_tw, None
+    else:
+        return phi_matrix, theta_matrix
 
 
 def artm_thetaless_em_optimization(
@@ -423,6 +456,7 @@ def artm_thetaless_em_optimization(
     if params is None:
         params = {}
     use_B_cheat = params.get('use_B_cheat', False)
+    return_counters = params.get('return_counters', False)
                              
     D, W = n_dw_matrix.shape
     T = phi_matrix.shape[0]
@@ -457,10 +491,11 @@ def artm_thetaless_em_optimization(
         phi_rev_matrix = np.transpose(phi_matrix / word_norm)
         
         theta_matrix = n_dw_matrix.dot(phi_rev_matrix)
+        theta_matrix[np.sum(theta_matrix, axis=1) < 1e-20, :] += 1
         theta_matrix /= np.sum(theta_matrix, axis=1)[:, np.newaxis]
         phi_matrix_tr = np.transpose(phi_matrix)
         
-        s_data = 1. / (inner1d(theta_matrix[docptr, :], phi_matrix_tr[wordptr, :]) + 1e-20)
+        s_data = 1. / (memory_efficient_inner1d(theta_matrix, docptr, phi_matrix_tr, wordptr) + 1e-20)
         A = scipy.sparse.csr_matrix(
             (
                 n_dw_matrix.data  * s_data , 
@@ -483,14 +518,19 @@ def artm_thetaless_em_optimization(
         
         n_tw += r_tw
         n_tw[n_tw < 1e-20] = 0
+
+        n_tw[np.sum(n_tw, axis=1) < 1e-20, :] += 1
         phi_matrix = n_tw / np.sum(n_tw, axis=1)[:, np.newaxis]
-        phi_matrix[np.isnan(phi_matrix)] = 0.
 
         if iteration_callback is not None:
             iteration_callback(it, phi_matrix, theta_matrix)
     
     print 'Iters time', time.time() - start_time    
-    return phi_matrix, theta_matrix
+    
+    if return_counters:
+        return phi_matrix, theta_matrix, n_tw, None
+    else:
+        return phi_matrix, theta_matrix
 
 
 def gradient_optimization(
@@ -506,6 +546,8 @@ def gradient_optimization(
 ):
     if params is None:
         params = {}
+    return_counters = params.get('return_counters', False)
+
     D, W = n_dw_matrix.shape
     T = phi_matrix.shape[0]
     phi_matrix = np.copy(phi_matrix)
@@ -521,7 +563,7 @@ def gradient_optimization(
     for it in xrange(iters_count):
         phi_matrix_tr = np.transpose(phi_matrix)
         # следующая строчка это 60% времени работы алгоритма
-        s_data = loss_function.calc_der(inner1d(theta_matrix[docptr, :], phi_matrix_tr[wordptr, :]))
+        s_data = loss_function.calc_der(memory_efficient_inner1d(theta_matrix, docptr, phi_matrix_tr, wordptr))
         # следующая часть это 25% времени работы алгоритма
         A = scipy.sparse.csr_matrix(
             (
@@ -548,14 +590,21 @@ def gradient_optimization(
         phi_matrix[phi_matrix < 0] = 0
         theta_matrix[theta_matrix < 0] = 0
         
+        phi_matrix[np.sum(phi_matrix, axis=1) < 1e-20, :] += 1
         phi_matrix /= np.sum(phi_matrix, axis=1)[:, np.newaxis]
+        
+        theta_matrix[np.sum(theta_matrix, axis=1) < 1e-20, :] += 1
         theta_matrix /= np.sum(theta_matrix, axis=1)[:, np.newaxis]
         
         if iteration_callback is not None:
             iteration_callback(it, phi_matrix, theta_matrix)
     
     print 'Iters time', time.time() - start_time  
-    return phi_matrix, theta_matrix
+    
+    if return_counters:
+        return phi_matrix, theta_matrix, n_tw, n_dt
+    else:
+        return phi_matrix, theta_matrix
 
 
 def svm_score(theta, targets, verbose=True):
@@ -615,7 +664,21 @@ def artm_get_avg_pairwise_kernels_jacards(phi):
     for i in xrange(T):
         for j in xrange(T):
             if i != j:
-                res += 1. * len(kernels[i] & kernels[j]) / len(kernels[i] | kernels[j])
+                res += 1. * len(kernels[i] & kernels[j]) / (len(kernels[i] | kernels[j]) + 0.1)
+    return res / T / (T - 1)
+
+
+def artm_get_avg_top_words_jacards(phi, top_size):
+    T, W = phi.shape
+    top_words = [
+        set(heapq.nlargest(top_size, xrange(W), key=lambda w: phi[t, w]))
+        for t in xrange(T)
+    ]
+    res = 0.
+    for i in xrange(T):
+        for j in xrange(T):
+            if i != j:
+                res += 1. * len(top_words[i] & top_words[j]) / (len(top_words[i] | top_words[j]) + 0.1)
     return res / T / (T - 1)
 
 
